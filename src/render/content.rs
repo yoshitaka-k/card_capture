@@ -141,6 +141,43 @@ fn player_content(app: &mut App, frame: &mut Frame, area: Rect) {
 
     app.positions.set_player_deck(player_chunks[0]);
     frame.render_widget(deck_content, player_chunks[0]);
+
+    let trash_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(25),
+            Constraint::Percentage(25),
+            Constraint::Percentage(25),
+            Constraint::Percentage(25),
+        ]).split(player_chunks[1]);
+
+    let player_trash_block = Block::default()
+        .title("Player Trash")
+        .title_style(Style::default().fg(Color::Blue).bold())
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(Color::Blue))
+        .padding(Padding::horizontal(1));
+
+    let player_trash_content = Paragraph::new(
+        format!("Player Trash count: {}", app.game.get_player_trash().len())
+    ).block(player_trash_block);
+
+    app.positions.set_player_trash(trash_chunks[0]);
+    frame.render_widget(player_trash_content, trash_chunks[0]);
+
+    let enemy_trash_block = Block::default()
+        .title("Enemy Trash")
+        .title_style(Style::default().fg(Color::Red).bold())
+        .borders(Borders::ALL)
+        .border_style(Style::default().fg(Color::Red))
+        .padding(Padding::horizontal(1));
+
+    let enemy_trash_content = Paragraph::new(
+        format!("Enemy Trash count: {}", app.game.get_enemy_trash().len())
+    ).block(enemy_trash_block);
+
+    app.positions.set_enemy_trash(trash_chunks[3]);
+    frame.render_widget(enemy_trash_content, trash_chunks[3]);
 }
 
 /// Render the hand content block
