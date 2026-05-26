@@ -1,4 +1,13 @@
 use crate::trump::{Card, Deck, DeckType, CardSet};
+use crate::trump::shuffle::{
+    hindu_shuffle,
+    riffle_shuffle,
+    deal_shuffle,
+    double_cut,
+    HinduParams,
+    RiffleParams,
+    DealParams,
+};
 
 #[derive(Default)]
 pub struct Game {
@@ -22,6 +31,16 @@ impl Game {
         self.player_hand = CardSet::new();
         self.enemy_trash = CardSet::new();
         self.player_trash = CardSet::new();
+    }
+
+    pub fn shuffle_enemy_deck(&mut self) {
+        let cards = self.enemy_deck.get_cards();
+        shuffle_deck(cards);
+    }
+
+    pub fn shuffle_player_deck(&mut self) {
+        let cards = self.player_deck.get_cards();
+        shuffle_deck(cards);
     }
 
     pub fn get_enemy_deck(&self) -> &Deck {
@@ -71,4 +90,11 @@ impl Game {
     pub fn draw_player_card(&mut self) -> Option<Card> {
         self.player_deck.draw()
     }
+}
+
+fn shuffle_deck(cards: &mut Vec<Card>) {
+    hindu_shuffle(cards, &HinduParams::default());
+    riffle_shuffle(cards, &RiffleParams::default());
+    deal_shuffle(cards, &DealParams::default());
+    double_cut(cards);
 }
