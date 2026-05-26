@@ -1,15 +1,16 @@
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
     style::{Color, Style},
-    text::Text,
     widgets::{Block, Borders, Paragraph, Padding},
     Frame,
 };
 
-use crate::app::App;
+use crate::{app::App, constants::MAX_HAND_SIZE, trump::deck::DeckType};
 
 /// Render the content block
-pub fn render_content_block(app: &App, frame: &mut Frame, area: Rect) {
+pub fn render_content_block(app: &mut App, frame: &mut Frame, area: Rect) {
+    app.positions.clear();
+
     let content_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
@@ -30,22 +31,67 @@ pub fn render_content_block(app: &App, frame: &mut Frame, area: Rect) {
     hand_content(app, frame, content_chunks[2]);
 
     // Help Block
-    help_content(frame, content_chunks[3]);
+    help_content(app, frame, content_chunks[3]);
+}
+
+fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: DeckType) {
+    let hand_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(25),
+            Constraint::Percentage(25),
+            Constraint::Percentage(25),
+            Constraint::Percentage(25),
+        ]).split(area);
+
+    // Enemy Hand Block（右端から手札を並べる）
+    for i in 0..MAX_HAND_SIZE {
+        let chunk_index = MAX_HAND_SIZE - 1 - i;
+        let chunk = hand_chunks[chunk_index];
+
+        let hand_block = Block::default()
+            .borders(Borders::ALL)
+            .border_style(match deck_type {
+                DeckType::Enemy => Style::default().fg(Color::Red),
+                DeckType::Player => Style::default().fg(Color::Green),
+            })
+            .padding(Padding::horizontal(1))
+            .style(Style::default());
+
+        let text = match deck_type {
+            DeckType::Enemy => {
+                if let Some(card) = app.game.get_enemy_hand().get_card(i) {
+                    format!("Enemy Hand: {}", card)
+                } else {
+                    String::from("Enemy Hand: Empty")
+                }
+            }
+            DeckType::Player => {
+                if let Some(card) = app.game.get_player_hand().get_card(i) {
+                    format!("Player Hand: {}", card)
+                } else {
+                    String::from("Player Hand: Empty")
+                }
+            }
+        };
+
+        let hand_content = Paragraph::new(text).block(hand_block);
+
+        match deck_type {
+            DeckType::Enemy => {
+                app.positions.add_enemy_hand(chunk);
+            }
+            DeckType::Player => {
+                app.positions.add_player_hand(chunk);
+            }
+        }
+        frame.render_widget(hand_content, chunk);
+    }
 }
 
 /// Render the enemy content block
-fn enemy_content(app: &App, frame: &mut Frame, area: Rect) {
+fn enemy_content(app: &mut App, frame: &mut Frame, area: Rect) {
     // Enemy Block
-    let enemy_block = Block::default()
-        .title("Enemy Content")
-        .title_style(Style::default().fg(Color::Red).bold())
-        .borders(Borders::ALL)
-        .border_style(Style::default().fg(Color::Red))
-        .padding(Padding::horizontal(1))
-        .style(Style::default());
-
-    frame.render_widget(enemy_block, area);
-
     let enemy_chunks = Layout::default()
         .direction(Direction::Horizontal)
         .constraints([
@@ -55,79 +101,55 @@ fn enemy_content(app: &App, frame: &mut Frame, area: Rect) {
 
     // Deck Block
     let deck_block = Block::default()
-        .title("Deck")
+        .title("Enemy Deck")
         .title_style(Style::default().fg(Color::Red).bold())
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::Red))
-        .padding(Padding::horizontal(1))
-        .style(Style::default());
+        .padding(Padding::horizontal(1));
 
-    let deck_content = Paragraph::new(format!("Enemy Deck count: {}", app.game.enemy_deck.len()))
-        .block(deck_block);
+    let deck_content = Paragraph::new(
+            format!("Enemy Deck count: {}", app.game.get_enemy_deck().len())
+        ).block(deck_block);
 
+    app.positions.set_enemy_deck(enemy_chunks[0]);
     frame.render_widget(deck_content, enemy_chunks[0]);
 
-    // Enemy Hand Block
-    let enemy_hand_block = Block::default()
-        .title("Enemy Hand")
-        .title_style(Style::default().fg(Color::Red).bold())
-        .borders(Borders::ALL)
-        .border_style(Style::default().fg(Color::Red))
-        .padding(Padding::horizontal(1))
-        .style(Style::default());
-
-    let enemy_hand_content = Paragraph::new(format!("Enemy Hand count: {}", app.game.enemy_hand.len()))
-        .block(enemy_hand_block);
-
-    frame.render_widget(enemy_hand_content, enemy_chunks[1]);
+    hand_area_layout(app, frame, enemy_chunks[1], DeckType::Enemy);
 }
 
 /// Render the player content block
-fn player_content(app: &App, frame: &mut Frame, area: Rect) {
-    let player_block = Block::default()
-        .title("Player Content")
+fn player_content(app: &mut App, frame: &mut Frame, area: Rect) {
+    // Player Block
+    let player_chunks = Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage(20),
+            Constraint::Percentage(80),
+        ]).split(area);
+
+    // Deck Block
+    let deck_block = Block::default()
+        .title("Player Deck")
         .title_style(Style::default().fg(Color::Blue).bold())
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::Blue))
-        .padding(Padding::horizontal(1))
-        .style(Style::default());
+        .padding(Padding::horizontal(1));
 
-    let player_content = Paragraph::new(format!("Player Deck count: {}", app.game.player_deck.len()))
-    .block(player_block);
+    let deck_content = Paragraph::new(
+            format!("Player Deck count: {}", app.game.get_player_deck().len())
+        ).block(deck_block);
 
-    frame.render_widget(player_content, area);
+    app.positions.set_player_deck(player_chunks[0]);
+    frame.render_widget(deck_content, player_chunks[0]);
 }
 
 /// Render the hand content block
-fn hand_content(app: &App, frame: &mut Frame, area: Rect) {
-    let hand_block = Block::default()
-        .title("Hand Content")
-        .title_style(Style::default().fg(Color::Green).bold())
-        .borders(Borders::ALL)
-        .border_style(Style::default().fg(Color::Green))
-        .padding(Padding::horizontal(1))
-        .style(Style::default());
-
-    let hand_content = Paragraph::new(format!("Player Hand count: {}", app.game.player_hand.len()))
-        .block(hand_block);
-
-    // let text = format!(
-    //     "Press `Esc`, `Ctrl-C` or `q` to stop running.\n\
-    //     Press `k` and `j` to increment and decrement the counter respectively.\n\
-    //     Counter: {}
-    //   ",
-    //     app.counter
-    // );
-    // let content_text = Text::styled(text, Style::default());
-
-    // let hand_content = Paragraph::new(content_text)
-    //     .block(hand_block);
-
-    frame.render_widget(hand_content, area);
+fn hand_content(app: &mut App, frame: &mut Frame, area: Rect) {
+    hand_area_layout(app, frame, area, DeckType::Player);
 }
 
 /// Render the help content block
-fn help_content(frame: &mut Frame, area: Rect) {
+fn help_content(app: &mut App, frame: &mut Frame, area: Rect) {
     let help_block = Block::default()
         .title("Help Content")
         .title_style(Style::default().fg(Color::Yellow).bold())
@@ -136,7 +158,7 @@ fn help_content(frame: &mut Frame, area: Rect) {
         .padding(Padding::horizontal(1))
         .style(Style::default());
 
-    let help_content = Paragraph::new("Help Content")
+    let help_content = Paragraph::new(app.help_text.clone())
     .block(help_block);
 
     frame.render_widget(help_content, area);

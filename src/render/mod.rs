@@ -6,3 +6,5 @@ pub mod content;
 pub mod footer;
 /// Render the exit popup block
 pub mod exiting;
+/// Render the block position
+pub mod block_position;

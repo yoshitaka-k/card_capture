@@ -1,5 +1,5 @@
-/// Render the UI components
-pub mod render;
+/// Constants
+pub mod constants;
 /// Application
 pub mod app;
 /// Event
@@ -8,6 +8,8 @@ pub mod event;
 pub mod ui;
 /// TUI
 pub mod tui;
+/// Render the UI components
+pub mod render;
 /// Application updater
 pub mod update;
 /// Trump

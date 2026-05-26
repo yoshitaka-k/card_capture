@@ -1,6 +1,5 @@
 use crate::trump::{Card};
 
-
 pub enum DeckType {
     Enemy,
     Player,

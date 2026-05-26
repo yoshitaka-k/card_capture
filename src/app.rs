@@ -1,16 +1,18 @@
 use crate::game::Game;
+use crate::render::block_position::BlockPosition;
 
-/// 現在の画面
+/// 現在の画面を管理する列挙体
 pub enum CurrentScreen {
     Main,
     Exiting,
 }
 
-/// アプリケーション
+/// アプリケーション状態を管理する構造体
 pub struct App {
     pub current_screen: CurrentScreen,
-    pub counter: u8,
     pub game: Game,
+    pub positions: BlockPosition,
+    pub help_text: String,
     pub should_quit: bool,
 }
 
@@ -18,8 +20,9 @@ impl App {
     pub fn new() -> Self {
         Self {
             current_screen: CurrentScreen::Main,
-            counter: 0,
             game: Game::new(),
+            positions: BlockPosition::default(),
+            help_text: String::new(),
             should_quit: false,
         }
     }
@@ -32,17 +35,5 @@ impl App {
 
     pub fn quit(&mut self) {
         self.should_quit = true;
-    }
-
-    pub fn increment_counter(&mut self) {
-        if let Some(res) = self.counter.checked_add(1) {
-            self.counter = res;
-        }
-    }
-
-    pub fn decrement_counter(&mut self) {
-        if let Some(res) = self.counter.checked_sub(1) {
-            self.counter = res;
-        }
     }
 }
