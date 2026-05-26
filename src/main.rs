@@ -4,23 +4,16 @@ use ratatui::{
 };
 use color_eyre::{Result};
 
-/// Application
-pub mod app;
-use app::App;
-/// Event
-pub mod event;
-use event::{Event, EventHandler};
-/// Widget
-pub mod ui;
-/// user interface
-pub mod tui;
-use tui::Tui;
-/// Application updater
-pub mod update;
-use update::update;
+use hello_ratatui::{
+    app::App,
+    event::{Event, EventHandler},
+    tui::Tui,
+    update::{key_update, mouse_update},
+};
 
 fn main() -> Result<()> {
     let mut app = App::new();
+    app.start();
 
     let backend = CrosstermBackend::new(std::io::stderr());
     let terminal = Terminal::new(backend)?;
@@ -33,8 +26,10 @@ fn main() -> Result<()> {
         tui.draw(&mut app)?;
         match tui.events.next()? {
             Event::Tick => {}
-            Event::Key(key_event) => update(&mut app, key_event),
-            Event::Mouse(_) => {}
+            Event::Key(key_event) => key_update(&mut app, key_event),
+            Event::Mouse(mouse_event) => {
+                mouse_update(&mut app, mouse_event);
+            }
             Event::Resize(_, _) => {}
         };
     }
