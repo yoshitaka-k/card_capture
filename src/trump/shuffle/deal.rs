@@ -43,6 +43,7 @@ fn deal_shuffle_once(cards: &mut Vec<Card>, pile_count: usize) {
         return;
     }
 
+    let total_cards = cards.len();
     let mut left = std::mem::take(cards);
     let mut piles: Vec<Vec<Card>> = (0..pile_count).map(|_| Vec::new()).collect();
 
@@ -54,11 +55,14 @@ fn deal_shuffle_once(cards: &mut Vec<Card>, pile_count: usize) {
     }
 
     let mut rng = SimpleRand::new();
-    let mut mixed = Vec::with_capacity(cards.len());
+    let mut mixed = Vec::with_capacity(total_cards);
     for pile in &mut piles {
         let take_n = rng.next_range(0..=pile.len() as isize) as usize;
         let start = pile.len() - take_n;
+
+        // 山をランダム位置でカットして、枚数を失わずに戻す。
         mixed.extend(pile.drain(start..));
+        mixed.extend(pile.drain(..));
     }
 
     *cards = mixed;
