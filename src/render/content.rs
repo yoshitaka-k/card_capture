@@ -4,8 +4,9 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph, Padding},
     Frame,
 };
+use std::fmt::Write as _;
 
-use crate::{app::App, constants::MAX_HAND_SIZE, trump::deck::DeckType};
+use crate::{app::App, constants::MAX_HAND_SIZE, trump::{deck::DeckType, Card}};
 
 /// Render the content block
 pub fn render_content_block(app: &mut App, frame: &mut Frame, area: Rect) {
@@ -63,26 +64,26 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                 if let Some(card) = app.game.get_enemy_hand().get_card(i) {
                     if let Some(selected_card) = &app.game.get_enemy_select() {
                         if card.equals(selected_card) {
-                            format!("Enemy Hand: {}\nSelected", card)
+                            build_hand_text("Enemy Hand: ", Some(card), true)
                         } else {
-                            format!("Enemy Hand: {}", card)
+                            build_hand_text("Enemy Hand: ", Some(card), false)
                         }
                     } else {
-                        format!("Enemy Hand: {}", card)
+                        build_hand_text("Enemy Hand: ", Some(card), false)
                     }
                 } else {
-                    String::from("Enemy Hand: Empty")
+                    build_hand_text("Enemy Hand: ", None, false)
                 }
             }
             DeckType::Player => {
                 if let Some(card) = app.game.get_player_hand().get_card(i) {
                     if app.game.is_player_selected(i) {
-                        format!("Player Hand: {}\nSelected", card)
+                        build_hand_text("Player Hand: ", Some(card), true)
                     } else {
-                        format!("Player Hand: {}", card)
+                        build_hand_text("Player Hand: ", Some(card), false)
                     }
                 } else {
-                    String::from("Player Hand: Empty")
+                    build_hand_text("Player Hand: ", None, false)
                 }
             }
         };
@@ -99,6 +100,21 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
         }
         frame.render_widget(hand_content, chunk);
     }
+}
+
+fn build_hand_text(prefix: &str, card: Option<&Card>, selected: bool) -> String {
+    let mut text = String::with_capacity(32);
+    text.push_str(prefix);
+    match card {
+        Some(card) => {
+            let _ = write!(&mut text, "{}", card);
+            if selected {
+                text.push_str("\nSelected");
+            }
+        }
+        None => text.push_str("Empty"),
+    }
+    text
 }
 
 /// Render the enemy content block
@@ -206,7 +222,7 @@ fn help_content(app: &mut App, frame: &mut Frame, area: Rect) {
         .padding(Padding::horizontal(1))
         .style(Style::default());
 
-    let help_content = Paragraph::new(app.help_text.clone())
+    let help_content = Paragraph::new(app.help_text.as_str())
     .block(help_block);
 
     frame.render_widget(help_content, area);

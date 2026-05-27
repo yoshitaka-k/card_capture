@@ -27,6 +27,7 @@ use crate::trump::constants::{
     KING_FROM_RANK,
     KING_TO_RANK,
 };
+use std::fmt::Write as _;
 
 /// カードの情報
 #[derive(Debug, Clone)]
@@ -96,7 +97,18 @@ impl Card {
             _ => "?",
         };
 
-        format!("{}{}", suit, self.get_disp_rank())
+        let mut name = String::with_capacity(4);
+        name.push_str(suit);
+        match self.rank {
+            ACE_FROM_RANK => name.push_str(ACE_STR_RANK),
+            JACK_FROM_RANK => name.push_str(JACK_STR_RANK),
+            QUEEN_FROM_RANK => name.push_str(QUEEN_STR_RANK),
+            KING_FROM_RANK => name.push_str(KING_STR_RANK),
+            _ => {
+                let _ = write!(&mut name, "{}", self.rank);
+            }
+        }
+        name
     }
 }
 
