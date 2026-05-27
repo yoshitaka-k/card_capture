@@ -8,3 +8,5 @@ pub mod footer;
 pub mod exiting;
 /// Render the block position
 pub mod block_position;
+/// Render the content block
+pub mod content_block;
