@@ -1,9 +1,9 @@
 [package]
-name = "hello_ratatui"
-version = "0.7.0"
+name = "card_capture"
+version = "0.7.1"
 edition = "2024"
 authors = ["yoshitaka-k"]
-description = "Ratatui Hello App"
+description = "Card Capture"
 license = "Apache-2.0"
 
 [dependencies]

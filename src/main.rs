@@ -4,7 +4,7 @@ use ratatui::{
 };
 use color_eyre::{Result};
 
-use hello_ratatui::{
+use card_capture::{
     app::App,
     event::{Event, EventHandler},
     tui::Tui,
