@@ -22,9 +22,9 @@ pub fn enemy_content(app: &mut App, frame: &mut Frame, area: Rect) {
     // Deck Block
     let deck_block = Block::default()
         .title("Enemy Deck")
-        .title_style(Style::default().fg(Color::Red).bold())
+        .title_style(Style::default().fg(Color::Magenta).bold())
         .borders(Borders::ALL)
-        .border_style(Style::default().fg(Color::Red))
+        .border_style(Style::default().fg(Color::Magenta))
         .padding(Padding::horizontal(1));
 
     let deck_content = Paragraph::new(
@@ -34,5 +34,6 @@ pub fn enemy_content(app: &mut App, frame: &mut Frame, area: Rect) {
     app.positions.set_enemy_deck(enemy_chunks[0]);
     frame.render_widget(deck_content, enemy_chunks[0]);
 
+    // Hand Area Block
     hand_area_layout(app, frame, enemy_chunks[1], DeckType::Enemy);
 }
