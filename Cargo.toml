@@ -6,6 +6,18 @@ authors = ["yoshitaka-k"]
 description = "Card Capture"
 license = "Apache-2.0"
 
+[profile.release]
+# バイナリサイズ最小化を最優先
+opt-level = "z"
+# ソースファイルを1個に合体
+lto = true
+# 並列コンパイルをやめて、1個の塊として極限まで最適化
+codegen-units = 1
+# パニック時のエラー追跡用データを全削除
+panic = "abort"
+# バイナリに含まれるデバッグ用文字（関数名とか）を全削除
+strip = true
+
 [dependencies]
 color-eyre = "0.6.5"
 ratatui = "0.30.0"
