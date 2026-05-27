@@ -75,15 +75,10 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
     for (visual_index, area) in app.positions.get_player_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
             let hand_index = visual_to_hand_index(visual_index);
-            if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
-                app.help_text = format!("Player selected a card: {}", card);
-                if app.game.is_player_selected(hand_index) {
-                    app.game.add_player_select(hand_index, false);
-                } else {
-                    app.game.add_player_select(hand_index, true);
-                }
+            if app.game.is_player_selected(hand_index) {
+                app.game.add_player_select(hand_index, false);
             } else {
-                app.help_text = String::from("Player selected a card: None");
+                app.game.add_player_select(hand_index, true);
             }
             break;
         }
@@ -102,7 +97,6 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         if area.contains(mouse_pos) {
             let hand_index = visual_to_hand_index(visual_index);
             if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
-                app.help_text = format!("Enemy selected a card: {}", card);
                 if let Some(selected_card) = app.game.get_enemy_select() {
                     if card.equals(&selected_card) {
                         app.game.add_enemy_select(None::<Card>);
@@ -112,8 +106,6 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
                 } else {
                     app.game.add_enemy_select(Some(card.clone()));
                 }
-            } else {
-                app.help_text = String::from("Enemy selected a card: None");
             }
             break;
         }
