@@ -126,6 +126,28 @@ impl Game {
         }
     }
 
+    /// プレイヤーの選択したカードの合計ランクを計算
+    pub fn calc_player_select_rank(&self) -> usize {
+        let mut rank = 0;
+        for (index, selected) in self.player_select.iter().enumerate() {
+            if *selected {
+                if let Some(card) = self.player_hand.get_card(index) {
+                    rank += card.get_calc_rank();
+                }
+            }
+        }
+        rank
+    }
+
+    /// 敵の選択したカードの合計ランクを計算
+    pub fn calc_enemy_select_rank(&self) -> usize {
+        let mut rank = 0;
+        if let Some(card) = &self.enemy_select {
+            rank += card.get_calc_rank();
+        }
+        rank
+    }
+
     /// 敵の捨て札にカードを追加
     pub fn add_enemy_discard(&mut self, card: Card) {
         self.enemy_discard.push(card);

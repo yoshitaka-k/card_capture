@@ -17,12 +17,14 @@ use crate::trump::Card;
 use std::fmt::Write as _;
 
 /// 見た目のインデックスを実データのインデックスに変換する
-pub fn visual_to_hand_index(visual_index: usize) -> usize {
+#[inline]
+fn visual_to_hand_index(visual_index: usize) -> usize {
     MAX_HAND_SIZE - 1 - visual_index
 }
 
 /// 手札テキストを構築する
-pub fn build_hand_text(prefix: &str, card: Option<&Card>, selected: bool) -> String {
+#[inline]
+fn build_hand_text(prefix: &str, card: Option<&Card>, selected: bool) -> String {
     let mut text = String::with_capacity(32);
     text.push_str(prefix);
     match card {

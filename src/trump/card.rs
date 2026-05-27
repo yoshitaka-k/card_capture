@@ -26,6 +26,10 @@ use crate::trump::constants::{
     KING_STR_RANK,
     KING_FROM_RANK,
     KING_TO_RANK,
+
+    JOKER_STR_RANK,
+    JOKER_FROM_RANK,
+    JOKER_TO_RANK,
 };
 use std::fmt::Write as _;
 
@@ -73,6 +77,7 @@ impl Card {
             QUEEN_FROM_RANK => QUEEN_TO_RANK,
             KING_FROM_RANK => KING_TO_RANK,
             ACE_FROM_RANK => ACE_TO_RANK,
+            JOKER_FROM_RANK => JOKER_TO_RANK,
             _ => self.rank,
         }
     }
@@ -83,6 +88,7 @@ impl Card {
             JACK_FROM_RANK => JACK_STR_RANK.to_string(),
             QUEEN_FROM_RANK => QUEEN_STR_RANK.to_string(),
             KING_FROM_RANK => KING_STR_RANK.to_string(),
+            JOKER_FROM_RANK => JOKER_STR_RANK.to_string(),
             _ => self.rank.to_string(),
         }
     }
@@ -104,6 +110,7 @@ impl Card {
             JACK_FROM_RANK => name.push_str(JACK_STR_RANK),
             QUEEN_FROM_RANK => name.push_str(QUEEN_STR_RANK),
             KING_FROM_RANK => name.push_str(KING_STR_RANK),
+            JOKER_FROM_RANK => name.push_str(JOKER_STR_RANK),
             _ => {
                 let _ = write!(&mut name, "{}", self.rank);
             }
