@@ -1,8 +1,8 @@
 use std::thread;
 use std::time::Duration;
-use rand::prelude::SliceRandom;
 
 use crate::trump::{Card};
+use crate::trump::shuffle::SimpleRand;
 
 /// ディール回数・山数の指定
 // 各CPU強さ処理から `deal_shuffle` に渡す。
@@ -53,11 +53,12 @@ fn deal_shuffle_once(cards: &mut Vec<Card>, pile_count: usize) {
         thread::sleep(Duration::from_millis(20));
     }
 
-    piles.shuffle(&mut rand::rng());
-
+    let mut rng = SimpleRand::new();
     let mut mixed = Vec::with_capacity(cards.len());
-    for pile in piles {
-        mixed.extend(pile);
+    for pile in &mut piles {
+        let take_n = rng.next_range(0..=pile.len() as isize) as usize;
+        let start = pile.len() - take_n;
+        mixed.extend(pile.drain(start..));
     }
 
     *cards = mixed;

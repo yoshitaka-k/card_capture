@@ -2,7 +2,7 @@ use std::thread;
 use std::time::Duration;
 
 use crate::trump::{Card};
-use rand::RngExt;
+use crate::trump::shuffle::SimpleRand;
 
 /// 山をだいたい三等分したうえで束の順番だけ入れ替える
 pub fn double_cut(cards: &mut Vec<Card>) {
@@ -11,13 +11,13 @@ pub fn double_cut(cards: &mut Vec<Card>) {
         return;
     }
 
-    let mut rng = rand::rng();
+    let mut rng = SimpleRand::new();
     let jitter = (n / 10).max(1);
 
     // 1本目はだいたい N/3、2本目はだいたい 2N/3（交互に切るリフルとは別の「位置ブレ」）
-    let cut1 = ((n / 3) as isize + rng.random_range(-(jitter as i64)..=(jitter as i64)) as isize)
+    let cut1 = ((n / 3) as isize + rng.next_range(-(jitter as isize)..=(jitter as isize)))
         .clamp(1, (n - 2) as isize) as usize;
-    let cut2 = ((2 * n / 3) as isize + rng.random_range(-(jitter as i64)..=(jitter as i64)) as isize)
+    let cut2 = ((2 * n / 3) as isize + rng.next_range(-(jitter as isize)..=(jitter as isize)))
         .clamp((cut1 + 1) as isize, (n - 1) as isize) as usize;
 
     let mut rest = std::mem::take(cards);

@@ -2,7 +2,7 @@ use std::thread;
 use std::time::Duration;
 
 use crate::trump::{Card};
-use rand::RngExt;
+use crate::trump::shuffle::SimpleRand;
 
 /// ヒンズー回数、落とす枚数の上限の指定
 pub struct HinduParams {
@@ -47,7 +47,7 @@ fn hindu_shuffle_once(cards: &mut Vec<Card>, min_chunk: usize, max_chunk: usize)
         return;
     }
 
-    let mut rng = rand::rng();
+    let mut rng = SimpleRand::new();
     let mut mixed = Vec::with_capacity(cards.len());
     let mut left = std::mem::take(cards);
 
@@ -61,11 +61,11 @@ fn hindu_shuffle_once(cards: &mut Vec<Card>, min_chunk: usize, max_chunk: usize)
         let jitter_hi = ((n.saturating_sub(2)) as isize).max(1);
 
         let min_cut = rng
-            .random_range(-(jitter as i64)..=(jitter as i64))
-            .clamp(-(jitter_hi as i64), jitter_hi as i64) as isize;
+            .next_range(-(jitter as isize)..=(jitter as isize))
+            .clamp(-(jitter_hi as isize), jitter_hi as isize) as isize;
         let max_cut = rng
-            .random_range(-(jitter as i64)..=(jitter as i64))
-            .clamp(-(jitter_hi as i64), jitter_hi as i64) as isize;
+            .next_range(-(jitter as isize)..=(jitter as isize))
+            .clamp(-(jitter_hi as isize), jitter_hi as isize) as isize;
 
         let mut chunk_min = (min_chunk as isize + min_cut).clamp(1, n as isize) as usize;
         let mut chunk_max = (max_chunk as isize + max_cut).clamp(1, n as isize) as usize;
@@ -75,7 +75,7 @@ fn hindu_shuffle_once(cards: &mut Vec<Card>, min_chunk: usize, max_chunk: usize)
             std::mem::swap(&mut chunk_min, &mut chunk_max);
         }
 
-        let take_n = rng.random_range(chunk_min..=chunk_max);
+        let take_n = rng.next_range(chunk_min as isize..=chunk_max as isize) as usize;
         let start = left.len() - take_n;
 
         mixed.extend(left.drain(start..));
