@@ -4,6 +4,7 @@ use ratatui::{
 };
 use color_eyre::{Result};
 
+use card_capture::constants::TICK_RATE_MILLIS;
 use card_capture::{
     app::App,
     event::{Event, EventHandler},
@@ -20,7 +21,7 @@ fn main() -> Result<()> {
 
     let backend = CrosstermBackend::new(std::io::stderr());
     let terminal = Terminal::new(backend)?;
-    let events = EventHandler::new(250);
+    let events = EventHandler::new(TICK_RATE_MILLIS);
     let mut tui = Tui::new(terminal, events);
 
     tui.enter()?;
