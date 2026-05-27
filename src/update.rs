@@ -72,32 +72,14 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
     }
 
     // Player Hand Select
-    if app.positions.get_player_hand()[0].contains(mouse_pos) {
-        if let Some(card) = app.game.get_player_hand().get_card(0) {
-            app.help_text = format!("Player selected a card: {}", card);
-        } else {
-            app.help_text = String::from("Player selected a card: None");
-        }
-    }
-    if app.positions.get_player_hand()[1].contains(mouse_pos) {
-        if let Some(card) = app.game.get_player_hand().get_card(1) {
-            app.help_text = format!("Player selected a card: {}", card);
-        } else {
-            app.help_text = String::from("Player selected a card: None");
-        }
-    }
-    if app.positions.get_player_hand()[2].contains(mouse_pos) {
-        if let Some(card) = app.game.get_player_hand().get_card(2) {
-            app.help_text = format!("Player selected a card: {}", card);
-        } else {
-            app.help_text = String::from("Player selected a card: None");
-        }
-    }
-    if app.positions.get_player_hand()[3].contains(mouse_pos) {
-        if let Some(card) = app.game.get_player_hand().get_card(3) {
-            app.help_text = format!("Player selected a card: {}", card);
-        } else {
-            app.help_text = String::from("Player selected a card: None");
+    for (i, area) in app.positions.get_player_hand().iter().enumerate() {
+        if area.contains(mouse_pos) {
+            app.help_text = if let Some(card) = app.game.get_player_hand().get_card(i) {
+                format!("Player selected a card: {}", card)
+            } else {
+                String::from("Player selected a card: None")
+            };
+            break;
         }
     }
 
@@ -110,68 +92,23 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
     }
 
     // Enemy Hand Select
-    if app.positions.get_enemy_hand()[0].contains(mouse_pos) {
-        if let Some(card) = app.game.get_enemy_hand().get_card(0) {
-            app.help_text = format!("Enemy selected a card: {}", card);
-            if let Some(selected_card) = app.game.get_enemy_select() {
-                if card.equals(&selected_card) {
-                    app.game.add_enemy_select(None::<Card>);
+    for (i, area) in app.positions.get_enemy_hand().iter().enumerate() {
+        if area.contains(mouse_pos) {
+            if let Some(card) = app.game.get_enemy_hand().get_card(i) {
+                app.help_text = format!("Enemy selected a card: {}", card);
+                if let Some(selected_card) = app.game.get_enemy_select() {
+                    if card.equals(&selected_card) {
+                        app.game.add_enemy_select(None::<Card>);
+                    } else {
+                        app.game.add_enemy_select(Some(card.clone()));
+                    }
                 } else {
                     app.game.add_enemy_select(Some(card.clone()));
                 }
             } else {
-                app.game.add_enemy_select(Some(card.clone()));
+                app.help_text = String::from("Enemy selected a card: None");
             }
-        } else {
-            app.help_text = String::from("Enemy selected a card: None");
-        }
-    }
-    if app.positions.get_enemy_hand()[1].contains(mouse_pos) {
-        if let Some(card) = app.game.get_enemy_hand().get_card(1) {
-            app.help_text = format!("Enemy selected a card: {}", card);
-            if let Some(selected_card) = app.game.get_enemy_select() {
-                if card.equals(&selected_card) {
-                    app.game.add_enemy_select(None::<Card>);
-                } else {
-                    app.game.add_enemy_select(Some(card.clone()));
-                }
-            } else {
-                app.game.add_enemy_select(Some(card.clone()));
-            }
-        } else {
-            app.help_text = String::from("Enemy selected a card: None");
-        }
-    }
-    if app.positions.get_enemy_hand()[2].contains(mouse_pos) {
-        if let Some(card) = app.game.get_enemy_hand().get_card(2) {
-            app.help_text = format!("Enemy selected a card: {}", card);
-            if let Some(selected_card) = app.game.get_enemy_select() {
-                if card.equals(&selected_card) {
-                    app.game.add_enemy_select(None::<Card>);
-                } else {
-                    app.game.add_enemy_select(Some(card.clone()));
-                }
-            } else {
-                app.game.add_enemy_select(Some(card.clone()));
-            }
-        } else {
-            app.help_text = String::from("Enemy selected a card: None");
-        }
-    }
-    if app.positions.get_enemy_hand()[3].contains(mouse_pos) {
-        if let Some(card) = app.game.get_enemy_hand().get_card(3) {
-            app.help_text = format!("Enemy selected a card: {}", card);
-            if let Some(selected_card) = app.game.get_enemy_select() {
-                if card.equals(&selected_card) {
-                    app.game.add_enemy_select(None::<Card>);
-                } else {
-                    app.game.add_enemy_select(Some(card.clone()));
-                }
-            } else {
-                app.game.add_enemy_select(Some(card.clone()));
-            }
-        } else {
-            app.help_text = String::from("Enemy selected a card: None");
+            break;
         }
     }
 }

@@ -14,7 +14,7 @@ pub fn render_header_block(frame: &mut Frame, area: Rect) {
         .style(Style::default());
 
     let header = Paragraph::new(Text::styled(
-        "Hello Ratatui App",
+        "Trump game Card Capture",
         Style::default().fg(Color::Green).bold(),
     ))
     .block(header_block);
