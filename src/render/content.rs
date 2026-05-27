@@ -45,10 +45,10 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
             Constraint::Percentage(25),
         ]).split(area);
 
-    // Enemy Hand Block（右端から手札を並べる）
-    for i in 0..MAX_HAND_SIZE {
-        let chunk_index = MAX_HAND_SIZE - 1 - i;
-        let chunk = hand_chunks[chunk_index];
+    // 見た目は左->右で走査し、実データ（手札）は右詰め対応の index に変換する。
+    for visual_index in 0..MAX_HAND_SIZE {
+        let hand_index = visual_to_hand_index(visual_index);
+        let chunk = hand_chunks[visual_index];
 
         let hand_block = Block::default()
             .borders(Borders::ALL)
@@ -61,7 +61,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
 
         let text = match deck_type {
             DeckType::Enemy => {
-                if let Some(card) = app.game.get_enemy_hand().get_card(i) {
+                if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
                     if let Some(selected_card) = &app.game.get_enemy_select() {
                         if card.equals(selected_card) {
                             build_hand_text("Enemy Hand: ", Some(card), true)
@@ -76,8 +76,8 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                 }
             }
             DeckType::Player => {
-                if let Some(card) = app.game.get_player_hand().get_card(i) {
-                    if app.game.is_player_selected(i) {
+                if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
+                    if app.game.is_player_selected(hand_index) {
                         build_hand_text("Player Hand: ", Some(card), true)
                     } else {
                         build_hand_text("Player Hand: ", Some(card), false)
@@ -115,6 +115,11 @@ fn build_hand_text(prefix: &str, card: Option<&Card>, selected: bool) -> String 
         None => text.push_str("Empty"),
     }
     text
+}
+
+#[inline]
+fn visual_to_hand_index(visual_index: usize) -> usize {
+    MAX_HAND_SIZE - 1 - visual_index
 }
 
 /// Render the enemy content block

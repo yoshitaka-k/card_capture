@@ -72,14 +72,15 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
     }
 
     // Player Hand Select
-    for (i, area) in app.positions.get_player_hand().iter().enumerate() {
+    for (visual_index, area) in app.positions.get_player_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
-            if let Some(card) = app.game.get_player_hand().get_card(i) {
+            let hand_index = visual_to_hand_index(visual_index);
+            if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
                 app.help_text = format!("Player selected a card: {}", card);
-                if app.game.is_player_selected(i) {
-                    app.game.add_player_select(i, false);
+                if app.game.is_player_selected(hand_index) {
+                    app.game.add_player_select(hand_index, false);
                 } else {
-                    app.game.add_player_select(i, true);
+                    app.game.add_player_select(hand_index, true);
                 }
             } else {
                 app.help_text = String::from("Player selected a card: None");
@@ -97,9 +98,10 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
     }
 
     // Enemy Hand Select
-    for (i, area) in app.positions.get_enemy_hand().iter().enumerate() {
+    for (visual_index, area) in app.positions.get_enemy_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
-            if let Some(card) = app.game.get_enemy_hand().get_card(i) {
+            let hand_index = visual_to_hand_index(visual_index);
+            if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
                 app.help_text = format!("Enemy selected a card: {}", card);
                 if let Some(selected_card) = app.game.get_enemy_select() {
                     if card.equals(&selected_card) {
@@ -116,4 +118,9 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
             break;
         }
     }
+}
+
+#[inline]
+fn visual_to_hand_index(visual_index: usize) -> usize {
+    MAX_HAND_SIZE - 1 - visual_index
 }
