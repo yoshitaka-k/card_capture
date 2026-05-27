@@ -76,12 +76,8 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
             }
             DeckType::Player => {
                 if let Some(card) = app.game.get_player_hand().get_card(i) {
-                    if let Some(selected_card) = &app.game.get_player_select_card(i) {
-                        if card.equals(selected_card) {
-                            format!("Player Hand: {}\nSelected", card)
-                        } else {
-                            format!("Player Hand: {}", card)
-                        }
+                    if app.game.is_player_selected(i) {
+                        format!("Player Hand: {}\nSelected", card)
                     } else {
                         format!("Player Hand: {}", card)
                     }

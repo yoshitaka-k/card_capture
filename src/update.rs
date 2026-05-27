@@ -76,14 +76,10 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         if area.contains(mouse_pos) {
             if let Some(card) = app.game.get_player_hand().get_card(i) {
                 app.help_text = format!("Player selected a card: {}", card);
-                if let Some(selected_card) = app.game.get_player_select_card(i) {
-                    if card.equals(selected_card) {
-                        app.game.add_player_select(i, None::<Card>);
-                    } else {
-                        app.game.add_player_select(i, Some(card.clone()));
-                    }
+                if app.game.is_player_selected(i) {
+                    app.game.add_player_select(i, false);
                 } else {
-                    app.game.add_player_select(i, Some(card.clone()));
+                    app.game.add_player_select(i, true);
                 }
             } else {
                 app.help_text = String::from("Player selected a card: None");

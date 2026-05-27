@@ -17,7 +17,7 @@ pub struct Game {
     enemy_hand: CardSet,
     player_hand: CardSet,
     enemy_select: Option<Card>,
-    player_select: Vec<Option<Card>>,
+    player_select: Vec<bool>,
     enemy_discard: Vec<Card>,
     player_discard: Vec<Card>,
 }
@@ -30,7 +30,7 @@ impl Game {
     pub fn start(&mut self) {
         self.enemy_deck = Deck::new(DeckType::Enemy);
         self.player_deck = Deck::new(DeckType::Player);
-        self.player_select = vec![None::<Card>; MAX_HAND_SIZE];
+        self.player_select = vec![false; MAX_HAND_SIZE];
     }
 
     /// 敵のデッキをシャッフル
@@ -99,8 +99,8 @@ impl Game {
     }
 
     /// プレイヤーの選択したカードを追加
-    pub fn add_player_select(&mut self, index: usize, card: Option<Card>) {
-        self.player_select[index] = card;
+    pub fn add_player_select(&mut self, index: usize, selected: bool) {
+        self.player_select[index] = selected;
     }
 
     /// 敵の選択したカードを取得
@@ -113,20 +113,16 @@ impl Game {
     }
 
     /// プレイヤーの選択したカードを取得
-    pub fn get_player_select(&self) -> &Vec<Option<Card>> {
+    pub fn get_player_select(&self) -> &Vec<bool> {
         &self.player_select
     }
 
-    /// プレイヤーの選択したカードを取得
-    pub fn get_player_select_card(&self, index: usize) -> Option<&Card> {
+    /// プレイヤーの選択状態を取得
+    pub fn is_player_selected(&self, index: usize) -> bool {
         if index < self.player_select.len() {
-            if let Some(card) = &self.player_select[index] {
-                Some(card)
-            } else {
-                None
-            }
+            self.player_select[index]
         } else {
-            None
+            false
         }
     }
 
