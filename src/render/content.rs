@@ -61,14 +61,30 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
         let text = match deck_type {
             DeckType::Enemy => {
                 if let Some(card) = app.game.get_enemy_hand().get_card(i) {
-                    format!("Enemy Hand: {}", card)
+                    if let Some(selected_card) = &app.game.get_enemy_select() {
+                        if card.equals(selected_card) {
+                            format!("Enemy Hand: {}\nSelected", card)
+                        } else {
+                            format!("Enemy Hand: {}", card)
+                        }
+                    } else {
+                        format!("Enemy Hand: {}", card)
+                    }
                 } else {
                     String::from("Enemy Hand: Empty")
                 }
             }
             DeckType::Player => {
                 if let Some(card) = app.game.get_player_hand().get_card(i) {
-                    format!("Player Hand: {}", card)
+                    if let Some(selected_card) = &app.game.get_player_select_card(i) {
+                        if card.equals(selected_card) {
+                            format!("Player Hand: {}\nSelected", card)
+                        } else {
+                            format!("Player Hand: {}", card)
+                        }
+                    } else {
+                        format!("Player Hand: {}", card)
+                    }
                 } else {
                     String::from("Player Hand: Empty")
                 }
@@ -151,32 +167,32 @@ fn player_content(app: &mut App, frame: &mut Frame, area: Rect) {
             Constraint::Percentage(25),
         ]).split(player_chunks[1]);
 
-    let player_trash_block = Block::default()
-        .title("Player Trash")
+    let player_discard_block = Block::default()
+        .title("Player Discard")
         .title_style(Style::default().fg(Color::Blue).bold())
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::Blue))
         .padding(Padding::horizontal(1));
 
-    let player_trash_content = Paragraph::new(
-        format!("Player Trash count: {}", app.game.get_player_trash().len())
-    ).block(player_trash_block);
+    let player_discard_content = Paragraph::new(
+        format!("Player Discard count: {}", app.game.get_player_discard().len())
+    ).block(player_discard_block);
 
-    app.positions.set_player_trash(trash_chunks[0]);
-    frame.render_widget(player_trash_content, trash_chunks[0]);
+    app.positions.set_player_discard(trash_chunks[0]);
+    frame.render_widget(player_discard_content, trash_chunks[0]);
 
     let enemy_trash_block = Block::default()
-        .title("Enemy Trash")
+        .title("Enemy Discard")
         .title_style(Style::default().fg(Color::Red).bold())
         .borders(Borders::ALL)
         .border_style(Style::default().fg(Color::Red))
         .padding(Padding::horizontal(1));
 
     let enemy_trash_content = Paragraph::new(
-        format!("Enemy Trash count: {}", app.game.get_enemy_trash().len())
+        format!("Enemy Discard count: {}", app.game.get_enemy_discard().len())
     ).block(enemy_trash_block);
 
-    app.positions.set_enemy_trash(trash_chunks[3]);
+    app.positions.set_enemy_discard(trash_chunks[3]);
     frame.render_widget(enemy_trash_content, trash_chunks[3]);
 }
 

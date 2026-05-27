@@ -9,6 +9,7 @@ use ratatui::crossterm::event::{
 };
 use crate::constants::MAX_HAND_SIZE;
 use crate::app::{App, CurrentScreen};
+use crate::trump::Card;
 
 /// キーイベントを処理する関数
 pub fn key_update(app: &mut App, key_event: KeyEvent) {
@@ -44,35 +45,133 @@ pub fn mouse_update(app: &mut App, mouse_event: MouseEvent) {
         CurrentScreen::Main => {
             match mouse_event.kind {
                 MouseEventKind::Up(MouseButton::Left) => {
-                    let mouse_pos = Position::new(mouse_event.column, mouse_event.row);
-                    if app.positions.get_player_deck().contains(mouse_pos) {
-                        if app.game.get_player_hand().len() < MAX_HAND_SIZE {
-                            if let Some(card) = app.game.draw_player_card() {
-                                app.game.add_player_hand(card);
-                            }
-                        }
-                    }
-                    if app.positions.get_enemy_deck().contains(mouse_pos) {
-                        if app.game.get_enemy_hand().len() < MAX_HAND_SIZE {
-                            if let Some(card) = app.game.draw_enemy_card() {
-                                app.game.add_enemy_hand(card);
-                            }
-                        }
-                    }
+                    handle_mouse_up_left(app, mouse_event);
                 }
                 _ => {}
             }
         }
         CurrentScreen::Exiting => {
             match mouse_event.kind {
-                MouseEventKind::Up(MouseButton::Left) => {
-                    app.should_quit = true;
-                }
                 MouseEventKind::Up(MouseButton::Right) => {
                     app.current_screen = CurrentScreen::Main;
                 }
                 _ => {}
             }
+        }
+    }
+}
+
+fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
+    let mouse_pos = Position::new(mouse_event.column, mouse_event.row);
+    // プレイヤーのデッキからカードを引く
+    if app.positions.get_player_deck().contains(mouse_pos)
+        && app.game.get_player_hand().len() < MAX_HAND_SIZE {
+        if let Some(card) = app.game.draw_player_card() {
+            app.game.add_player_hand(card);
+        }
+    }
+
+    // Player Hand Select
+    if app.positions.get_player_hand()[0].contains(mouse_pos) {
+        if let Some(card) = app.game.get_player_hand().get_card(0) {
+            app.help_text = format!("Player selected a card: {}", card);
+        } else {
+            app.help_text = String::from("Player selected a card: None");
+        }
+    }
+    if app.positions.get_player_hand()[1].contains(mouse_pos) {
+        if let Some(card) = app.game.get_player_hand().get_card(1) {
+            app.help_text = format!("Player selected a card: {}", card);
+        } else {
+            app.help_text = String::from("Player selected a card: None");
+        }
+    }
+    if app.positions.get_player_hand()[2].contains(mouse_pos) {
+        if let Some(card) = app.game.get_player_hand().get_card(2) {
+            app.help_text = format!("Player selected a card: {}", card);
+        } else {
+            app.help_text = String::from("Player selected a card: None");
+        }
+    }
+    if app.positions.get_player_hand()[3].contains(mouse_pos) {
+        if let Some(card) = app.game.get_player_hand().get_card(3) {
+            app.help_text = format!("Player selected a card: {}", card);
+        } else {
+            app.help_text = String::from("Player selected a card: None");
+        }
+    }
+
+    // 敵のデッキからカードを引く
+    if app.positions.get_enemy_deck().contains(mouse_pos)
+        && app.game.get_enemy_hand().len() < MAX_HAND_SIZE {
+        if let Some(card) = app.game.draw_enemy_card() {
+            app.game.add_enemy_hand(card);
+        }
+    }
+
+    // Enemy Hand Select
+    if app.positions.get_enemy_hand()[0].contains(mouse_pos) {
+        if let Some(card) = app.game.get_enemy_hand().get_card(0) {
+            app.help_text = format!("Enemy selected a card: {}", card);
+            if let Some(selected_card) = app.game.get_enemy_select() {
+                if card.equals(&selected_card) {
+                    app.game.add_enemy_select(None::<Card>);
+                } else {
+                    app.game.add_enemy_select(Some(card.clone()));
+                }
+            } else {
+                app.game.add_enemy_select(Some(card.clone()));
+            }
+        } else {
+            app.help_text = String::from("Enemy selected a card: None");
+        }
+    }
+    if app.positions.get_enemy_hand()[1].contains(mouse_pos) {
+        if let Some(card) = app.game.get_enemy_hand().get_card(1) {
+            app.help_text = format!("Enemy selected a card: {}", card);
+            if let Some(selected_card) = app.game.get_enemy_select() {
+                if card.equals(&selected_card) {
+                    app.game.add_enemy_select(None::<Card>);
+                } else {
+                    app.game.add_enemy_select(Some(card.clone()));
+                }
+            } else {
+                app.game.add_enemy_select(Some(card.clone()));
+            }
+        } else {
+            app.help_text = String::from("Enemy selected a card: None");
+        }
+    }
+    if app.positions.get_enemy_hand()[2].contains(mouse_pos) {
+        if let Some(card) = app.game.get_enemy_hand().get_card(2) {
+            app.help_text = format!("Enemy selected a card: {}", card);
+            if let Some(selected_card) = app.game.get_enemy_select() {
+                if card.equals(&selected_card) {
+                    app.game.add_enemy_select(None::<Card>);
+                } else {
+                    app.game.add_enemy_select(Some(card.clone()));
+                }
+            } else {
+                app.game.add_enemy_select(Some(card.clone()));
+            }
+        } else {
+            app.help_text = String::from("Enemy selected a card: None");
+        }
+    }
+    if app.positions.get_enemy_hand()[3].contains(mouse_pos) {
+        if let Some(card) = app.game.get_enemy_hand().get_card(3) {
+            app.help_text = format!("Enemy selected a card: {}", card);
+            if let Some(selected_card) = app.game.get_enemy_select() {
+                if card.equals(&selected_card) {
+                    app.game.add_enemy_select(None::<Card>);
+                } else {
+                    app.game.add_enemy_select(Some(card.clone()));
+                }
+            } else {
+                app.game.add_enemy_select(Some(card.clone()));
+            }
+        } else {
+            app.help_text = String::from("Enemy selected a card: None");
         }
     }
 }
