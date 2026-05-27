@@ -1,3 +1,4 @@
+use crate::constants::MAX_HAND_SIZE;
 use crate::trump::{Card, Deck, DeckType, CardSet};
 use crate::trump::shuffle::{
     hindu_shuffle,
@@ -29,6 +30,7 @@ impl Game {
     pub fn start(&mut self) {
         self.enemy_deck = Deck::new(DeckType::Enemy);
         self.player_deck = Deck::new(DeckType::Player);
+        self.player_select = vec![None::<Card>; MAX_HAND_SIZE];
     }
 
     /// 敵のデッキをシャッフル
@@ -97,8 +99,8 @@ impl Game {
     }
 
     /// プレイヤーの選択したカードを追加
-    pub fn add_player_select(&mut self, card: Option<Card>) {
-        self.player_select.push(card);
+    pub fn add_player_select(&mut self, index: usize, card: Option<Card>) {
+        self.player_select[index] = card;
     }
 
     /// 敵の選択したカードを取得
