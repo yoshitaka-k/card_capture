@@ -60,8 +60,36 @@ pub fn mouse_update(app: &mut App, mouse_event: MouseEvent) {
     }
 }
 
+/// マウス左クリックイベントを処理する関数
 fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
     let mouse_pos = Position::new(mouse_event.column, mouse_event.row);
+
+    // 敵のデッキからカードを引く
+    if app.positions.get_enemy_deck().contains(mouse_pos)
+        && app.game.get_enemy_hand().len() < MAX_HAND_SIZE {
+        if let Some(card) = app.game.draw_enemy_card() {
+            app.game.add_enemy_hand(card);
+        }
+    }
+
+    // 敵の手札からカードを選択する
+    for (visual_index, area) in app.positions.get_enemy_hand().iter().enumerate() {
+        if area.contains(mouse_pos) {
+            let hand_index = visual_to_hand_index(visual_index);
+            if let Some(_) = app.game.get_enemy_hand().get_card(hand_index) {
+                if app.game.is_enemy_selected(hand_index) {
+                    app.game.add_enemy_select(hand_index, false);
+                } else {
+                    app.game.add_enemy_select(hand_index, true);
+                }
+            } else {
+                app.game.add_enemy_select(hand_index, false);
+            }
+            update_player_capture(app);
+            break;
+        }
+    }
+
     // プレイヤーのデッキからカードを引く
     if app.positions.get_player_deck().contains(mouse_pos)
         && app.game.get_player_hand().len() < MAX_HAND_SIZE {
@@ -113,32 +141,6 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
                 }
             } else {
                 app.game.add_player_select(hand_index, false);
-            }
-            update_player_capture(app);
-            break;
-        }
-    }
-
-    // 敵のデッキからカードを引く
-    if app.positions.get_enemy_deck().contains(mouse_pos)
-        && app.game.get_enemy_hand().len() < MAX_HAND_SIZE {
-        if let Some(card) = app.game.draw_enemy_card() {
-            app.game.add_enemy_hand(card);
-        }
-    }
-
-    // 敵の手札からカードを選択する
-    for (visual_index, area) in app.positions.get_enemy_hand().iter().enumerate() {
-        if area.contains(mouse_pos) {
-            let hand_index = visual_to_hand_index(visual_index);
-            if let Some(_) = app.game.get_enemy_hand().get_card(hand_index) {
-                if app.game.is_enemy_selected(hand_index) {
-                    app.game.add_enemy_select(hand_index, false);
-                } else {
-                    app.game.add_enemy_select(hand_index, true);
-                }
-            } else {
-                app.game.add_enemy_select(hand_index, false);
             }
             update_player_capture(app);
             break;
