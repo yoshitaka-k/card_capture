@@ -38,6 +38,10 @@ impl Deck {
         Self { cards: cards }
     }
 
+    pub fn set_cards(&mut self, cards: Vec<Card>) {
+        self.cards = cards;
+    }
+
     pub fn get_cards(&mut self) -> &mut Vec<Card> {
         &mut self.cards
     }

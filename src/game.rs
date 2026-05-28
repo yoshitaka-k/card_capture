@@ -45,6 +45,11 @@ impl Game {
         self.player_select = vec![false; MAX_HAND_SIZE];
     }
 
+    /// プレイヤーのデッキにカードを設定
+    pub fn set_player_deck_cards(&mut self, cards: Vec<Card>) {
+        self.player_deck.set_cards(cards);
+    }
+
     /// 敵のデッキをシャッフル
     pub fn shuffle_enemy_deck(&mut self) {
         let cards = self.enemy_deck.get_cards();

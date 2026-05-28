@@ -198,10 +198,21 @@ fn handle_capture(app: &mut App, mouse_pos: Position) {
 /// プレイヤーのデッキからカードを引くイベントを処理する
 fn handle_draw(app: &mut App, mouse_pos: Position) {
     // プレイヤーのデッキからカードを引く
-    if app.positions.get_player_deck().contains(mouse_pos)
-        && app.game.get_player_hand().len() < MAX_HAND_SIZE {
-        if let Some(card) = app.game.draw_player_card() {
-            app.game.add_player_hand(card);
+    if app.positions.get_player_deck().contains(mouse_pos) {
+        if app.game.get_player_hand().len() < MAX_HAND_SIZE {
+            if let Some(card) = app.game.draw_player_card() {
+                app.game.add_player_hand(card);
+            } else {
+                let cards = app.game.get_player_discard().clone();
+                app.game.set_player_deck_cards(cards);
+                app.game.shuffle_player_deck();
+
+                app.game.clear_player_discard();
+
+                if let Some(card) = app.game.draw_player_card() {
+                    app.game.add_player_hand(card);
+                }
+            }
         }
     }
 
