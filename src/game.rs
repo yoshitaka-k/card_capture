@@ -27,6 +27,8 @@ pub struct Game {
     player_discard: Vec<Card>,
     enemy_select: Vec<bool>,
     player_select: Vec<bool>,
+    enemy_suit: String,
+    player_suit: String,
     enemy_cupture: bool,
     player_cupture: bool,
     discard: bool,
@@ -251,6 +253,36 @@ impl Game {
         self.player_select = vec![false; MAX_HAND_SIZE];
     }
 
+    /// 敵のスートを設定
+    pub fn set_enemy_suit(&mut self, suit: &str) {
+        self.enemy_suit = suit.to_string();
+    }
+
+    /// プレイヤーのスートを設定
+    pub fn set_player_suit(&mut self, suit: &str) {
+        self.player_suit = suit.to_string();
+    }
+
+    /// 敵のスートを取得
+    pub fn get_enemy_suit(&self) -> &String {
+        &self.enemy_suit
+    }
+
+    /// プレイヤーのスートを取得
+    pub fn get_player_suit(&self) -> &String {
+        &self.player_suit
+    }
+
+    /// 敵のスートをクリア
+    pub fn clear_enemy_suit(&mut self) {
+        self.enemy_suit = String::new();
+    }
+
+    /// プレイヤーのスートをクリア
+    pub fn clear_player_suit(&mut self) {
+        self.player_suit = String::new();
+    }
+
     /// 敵の捕獲状態を設定
     pub fn set_enemy_cupture(&mut self, cupture: bool) {
         self.enemy_cupture = cupture;
@@ -309,6 +341,16 @@ impl Game {
     /// プレイヤーの捨て札を取得
     pub fn get_player_discard(&self) -> &Vec<Card> {
         &self.player_discard
+    }
+
+    /// プレイヤーの捨て札をクリア
+    pub fn clear_player_discard(&mut self) {
+        self.player_discard.clear();
+    }
+
+    /// 敵の捨て札をクリア
+    pub fn clear_enemy_discard(&mut self) {
+        self.enemy_discard.clear();
     }
 
     /// 敵のデッキからカードを引く

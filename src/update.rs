@@ -146,13 +146,17 @@ fn handle_capture(app: &mut App, mouse_pos: Position) {
     for (visual_index, area) in app.positions.get_enemy_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
             let hand_index = visual_to_hand_index(visual_index);
-            if let Some(_) = app.game.get_enemy_hand().get_card(hand_index) {
+            if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
                 if app.game.is_enemy_selected(hand_index) {
+                    app.game.clear_enemy_suit();
                     app.game.add_enemy_select(hand_index, false);
                 } else {
+                    let suit = card.get_suit().clone();
+                    app.game.set_enemy_suit(&suit);
                     app.game.add_enemy_select(hand_index, true);
                 }
             } else {
+                app.game.clear_enemy_suit();
                 app.game.add_enemy_select(hand_index, false);
             }
 
@@ -239,13 +243,17 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
     for (visual_index, area) in app.positions.get_player_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
             let hand_index = visual_to_hand_index(visual_index);
-            if let Some(_) = app.game.get_player_hand().get_card(hand_index) {
+            if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
                 if app.game.is_player_selected(hand_index) {
+                    app.game.clear_player_suit();
                     app.game.add_player_select(hand_index, false);
                 } else {
+                    let suit = card.get_suit().clone();
+                    app.game.set_player_suit(&suit);
                     app.game.add_player_select(hand_index, true);
                 }
             } else {
+                app.game.clear_player_suit();
                 app.game.add_player_select(hand_index, false);
             }
 
