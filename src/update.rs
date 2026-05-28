@@ -86,8 +86,7 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
                 app.game.add_enemy_select(hand_index, false);
             }
 
-            update_sacrifice(app);
-            update_player_capture(app);
+            update_flags(app);
 
             break;
         }
@@ -95,6 +94,10 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
 
     // 敵の捨て札クリックイベント処理
     if app.positions.get_enemy_discard().contains(mouse_pos) {
+        if app.game.is_enemy_cupture() {
+            enemy_capture_event(app);
+        }
+
         // 生贄処理を行う
         // 選択したプレイヤーカードを敵の捨て札へ
         // 選択した的カードを敵デッキの一番下に追加
@@ -139,8 +142,7 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         app.game.clear_enemy_select();
         app.game.clear_player_select();
 
-        update_sacrifice(app);
-        update_player_capture(app);
+        update_flags(app);
     }
 
     // プレイヤーの手札からカードを選択する
@@ -157,12 +159,46 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
                 app.game.add_player_select(hand_index, false);
             }
 
-            update_sacrifice(app);
-            update_player_capture(app);
+            update_flags(app);
 
             break;
         }
     }
+}
+
+/// ビジュアルインデックスを手札インデックスに変換する
+#[inline]
+fn visual_to_hand_index(visual_index: usize) -> usize {
+    MAX_HAND_SIZE - 1 - visual_index
+}
+
+/// 敵の捕獲イベントを処理する
+fn enemy_capture_event(app: &mut App) {
+    for (visual_index, _) in app.positions.get_enemy_hand().iter().enumerate() {
+        let hand_index = visual_to_hand_index(visual_index);
+        if app.game.is_enemy_selected(hand_index) {
+            if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
+                app.game.add_enemy_discard(enemy_card.clone());
+                app.game.remove_enemy_hand_card(hand_index);
+            }
+        }
+    }
+
+    // プレイヤーの選択したカードを敵の捨て札へ送る
+    for (visual_index, _) in app.positions.get_player_hand().iter().enumerate() {
+        let hand_index = visual_to_hand_index(visual_index);
+        if app.game.is_player_selected(hand_index) {
+            if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
+                app.game.add_enemy_discard(player_card.clone());
+                app.game.remove_player_hand_card(hand_index);
+            }
+        }
+    }
+
+    app.game.clear_enemy_select();
+    app.game.clear_player_select();
+
+    update_flags(app);
 }
 
 /// 生贄イベントを処理する
@@ -192,14 +228,14 @@ fn sacrifice_event(app: &mut App) {
     app.game.clear_enemy_select();
     app.game.clear_player_select();
 
-    update_sacrifice(app);
-    update_player_capture(app);
+    update_flags(app);
 }
 
-/// ビジュアルインデックスを手札インデックスに変換する
-#[inline]
-fn visual_to_hand_index(visual_index: usize) -> usize {
-    MAX_HAND_SIZE - 1 - visual_index
+/// フラグを更新する
+fn update_flags(app: &mut App) {
+    update_enemy_capture(app);
+    update_player_capture(app);
+    update_sacrifice(app);
 }
 
 /// 捕獲できるか判定する
@@ -215,8 +251,6 @@ fn update_player_capture(app: &mut App) -> bool {
     let player_select_rank = app.game.calc_player_select_rank();
     let enemy_select_rank = app.game.calc_enemy_select_rank();
 
-    app.help_text = format!("player_select_rank: {}, enemy_select_rank: {}", player_select_rank, enemy_select_rank);
-
     if player_select_rank >= enemy_select_rank {
         app.game.set_player_cupture(true);
         true
@@ -224,6 +258,32 @@ fn update_player_capture(app: &mut App) -> bool {
         app.game.set_player_cupture(false);
         false
     }
+}
+
+/// 敵の捕獲フラグを更新する
+/// 敵の手札の右端選択と、プレイヤーの手札の1枚選択があれば敵の捕獲フラグを立てる
+fn update_enemy_capture(app: &mut App) -> bool {
+    if app.game.get_enemy_select().iter().all(|&selected| !selected)
+        || app.game.get_player_select().iter().all(|&selected| !selected) {
+        app.game.set_enemy_cupture(false);
+        return false;
+    }
+
+    let enemy_cnt = app.game.get_enemy_select()
+        .iter().filter(|&&selected| selected)
+        .count();
+
+    let player_cnt = app.game.get_player_select()
+        .iter().filter(|&&selected| selected)
+        .count();
+
+    if enemy_cnt == 1 && player_cnt == 1 {
+        app.game.set_enemy_cupture(true);
+        return true;
+    }
+
+    app.game.set_enemy_cupture(false);
+    false
 }
 
 /// 生贄フラグを更新する
@@ -234,15 +294,10 @@ fn update_sacrifice(app: &mut App) -> bool {
         return false;
     }
 
-    let mut sacrifice = 0;
-    for selected in app.game.get_player_select().iter() {
-        if *selected {
-            sacrifice += 1;
-        }
-    }
+    let cnt = app.game.get_player_select()
+        .iter().filter(|&&selected| selected)
+        .count();
 
-    // app.help_text = format!("sacrifice: {}", sacrifice);
-
-    app.game.set_sacrifice(sacrifice == 2);
-    sacrifice == 2
+    app.game.set_sacrifice(cnt == 2);
+    cnt == 2
 }
