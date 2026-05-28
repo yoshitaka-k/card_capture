@@ -19,11 +19,11 @@ pub fn render_content_block(app: &mut App, frame: &mut Frame, area: Rect) {
     let content_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Min(3),
-            Constraint::Percentage(35),
+            Constraint::Length(4),
             Constraint::Percentage(35),
             Constraint::Percentage(30),
-            Constraint::Min(3),
+            Constraint::Percentage(35),
+            Constraint::Length(5),
         ])
         .split(area);
 

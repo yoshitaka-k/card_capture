@@ -35,7 +35,7 @@ impl App {
         Self {
             current_screen: CurrentScreen::Main,
             current_phase: GamePhase::Setup,
-            turn: 0,
+            turn: 1,
             game: Game::new(),
             positions: BlockPosition::default(),
             help_text: String::new(),

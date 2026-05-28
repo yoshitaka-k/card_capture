@@ -73,12 +73,12 @@ fn discard_content(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Deck
         .title(title)
         .title_style(Style::default().fg(match deck_type {
             DeckType::Player => Color::Green,
-            DeckType::Enemy => Color::Gray,
+            DeckType::Enemy => Color::DarkGray,
         }).bold())
         .borders(Borders::ALL)
         .border_style(Style::default().fg(match deck_type {
             DeckType::Player => Color::Green,
-            DeckType::Enemy => Color::Gray,
+            DeckType::Enemy => Color::DarkGray,
         }))
         .padding(Padding::horizontal(1));
 

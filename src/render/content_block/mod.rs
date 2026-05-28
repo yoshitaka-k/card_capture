@@ -49,19 +49,14 @@ fn build_hand_text(prefix: &str, card: Option<&Card>, selected: bool) -> String 
 fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: DeckType) {
     let hand_chunks = Layout::default()
         .direction(Direction::Horizontal)
-        .constraints([
-            Constraint::Percentage(25),
-            Constraint::Percentage(25),
-            Constraint::Percentage(25),
-            Constraint::Percentage(25),
-        ]).split(area);
+        .constraints([Constraint::Percentage(25); 4]).split(area);
 
     // 見た目は左->右で走査し、実データ（手札）は右詰め対応の index に変換する。
     for visual_index in 0..MAX_HAND_SIZE {
         let hand_index = visual_to_hand_index(visual_index);
         let chunk = hand_chunks[visual_index];
 
-        let hand_block = Block::default()
+        let block = Block::default()
             .borders(Borders::ALL)
             .border_style(match deck_type {
                 DeckType::Enemy => Style::default().fg(Color::Magenta),
@@ -70,7 +65,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
             .padding(Padding::horizontal(1))
             .style(Style::default());
 
-        let text = match deck_type {
+        let paragraph = Paragraph::new(match deck_type {
             DeckType::Enemy => {
                 if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
                     if app.game.is_enemy_selected(hand_index) {
@@ -93,9 +88,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                     build_hand_text("Player Hand: ", None, false)
                 }
             }
-        };
-
-        let hand_content = Paragraph::new(text).block(hand_block);
+        }).block(block);
 
         match deck_type {
             DeckType::Enemy => {
@@ -105,6 +98,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                 app.positions.add_player_hand(chunk);
             }
         }
-        frame.render_widget(hand_content, chunk);
+
+        frame.render_widget(paragraph, chunk);
     }
 }
