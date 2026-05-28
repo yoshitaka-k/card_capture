@@ -4,9 +4,9 @@ pub mod header;
 pub mod content;
 /// Render the footer block
 pub mod footer;
-/// Render the exit popup block
-pub mod exiting;
 /// Render the block position
 pub mod block_position;
 /// Render the content block
 pub mod content_block;
+/// Render the popup block
+pub mod popup;

@@ -8,7 +8,7 @@ use crate::render::{
     header::render_header_block,
     content::render_content_block,
     footer::render_footer_block,
-    exiting::render_exit_popup_block,
+    popup::exiting::render_exit_popup_block,
 };
 
 pub fn render(app: &mut App, frame: &mut Frame) {
@@ -32,8 +32,11 @@ pub fn render(app: &mut App, frame: &mut Frame) {
     // Footer Block
     render_footer_block(app, frame, chunks[2]);
 
-    // exit popup window
-    if let CurrentScreen::Exiting = app.current_screen {
-        render_exit_popup_block(frame);
+    // popup window
+    match app.current_screen {
+        CurrentScreen::Main => {},
+        CurrentScreen::Exiting => {
+            render_exit_popup_block(frame);
+        }
     }
 }
