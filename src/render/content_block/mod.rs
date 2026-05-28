@@ -6,6 +6,8 @@ pub mod middle;
 pub mod player;
 /// Help Content Block
 pub mod help;
+/// Phase Content Block
+pub mod phase;
 
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
@@ -62,8 +64,8 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
         let hand_block = Block::default()
             .borders(Borders::ALL)
             .border_style(match deck_type {
-                DeckType::Enemy => Style::default().fg(Color::Red),
-                DeckType::Player => Style::default().fg(Color::Green),
+                DeckType::Enemy => Style::default().fg(Color::Magenta),
+                DeckType::Player => Style::default().fg(Color::Cyan),
             })
             .padding(Padding::horizontal(1))
             .style(Style::default());

@@ -22,9 +22,9 @@ pub fn enemy_content(app: &mut App, frame: &mut Frame, area: Rect) {
     // Deck Block
     let deck_block = Block::default()
         .title("Enemy Deck")
-        .title_style(Style::default().fg(Color::Magenta).bold())
+        .title_style(Style::default().fg(Color::Red).bold())
         .borders(Borders::ALL)
-        .border_style(Style::default().fg(Color::Magenta))
+        .border_style(Style::default().fg(Color::Red))
         .padding(Padding::horizontal(1));
 
     let deck_content = Paragraph::new(

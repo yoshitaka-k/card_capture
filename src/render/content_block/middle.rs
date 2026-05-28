@@ -39,7 +39,7 @@ pub fn middle_content(app: &mut App, frame: &mut Frame, area: Rect) {
 
     // Player Content Block
     let player_content = Paragraph::new(format!("Player: {}", app.game.calc_player_select_rank()))
-        .style(Style::default().fg(Color::Blue).bold())
+        .style(Style::default().fg(Color::Cyan).bold())
         .block(Block::default().padding(Padding::horizontal(1)))
         .alignment(Alignment::Center);
     frame.render_widget(player_content, battle_chunks[0]);
@@ -71,9 +71,15 @@ fn discard_content(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Deck
     // Player Discard Block
     let discard_block = Block::default()
         .title(title)
-        .title_style(Style::default().fg(Color::Blue).bold())
+        .title_style(Style::default().fg(match deck_type {
+            DeckType::Player => Color::Green,
+            DeckType::Enemy => Color::Gray,
+        }).bold())
         .borders(Borders::ALL)
-        .border_style(Style::default().fg(Color::Blue))
+        .border_style(Style::default().fg(match deck_type {
+            DeckType::Player => Color::Green,
+            DeckType::Enemy => Color::Gray,
+        }))
         .padding(Padding::horizontal(1));
 
     let discard_content = Paragraph::new(match deck_type {
