@@ -3,12 +3,13 @@ use ratatui::layout::Rect;
 /// ブロックの位置を管理する構造体
 #[derive(Default)]
 pub struct BlockPosition {
-    player_deck: Rect,
     enemy_deck: Rect,
-    player_hand: Vec<Rect>,
+    player_deck: Rect,
     enemy_hand: Vec<Rect>,
-    player_discard: Rect,
+    player_hand: Vec<Rect>,
+    player_hand_joker: Vec<Rect>,
     enemy_discard: Rect,
+    player_discard: Rect,
 }
 
 impl BlockPosition {
@@ -30,6 +31,10 @@ impl BlockPosition {
 
     pub fn add_player_hand(&mut self, rect: Rect) {
         self.player_hand.push(rect);
+    }
+
+    pub fn add_player_hand_joker(&mut self, rect: Rect) {
+        self.player_hand_joker.push(rect);
     }
 
     pub fn add_enemy_hand(&mut self, rect: Rect) {
@@ -60,6 +65,10 @@ impl BlockPosition {
         &self.player_hand
     }
 
+    pub fn get_player_hand_joker(&self) -> &Vec<Rect> {
+        &self.player_hand_joker
+    }
+
     pub fn get_player_discard(&self) -> &Rect {
         &self.player_discard
     }
@@ -74,5 +83,9 @@ impl BlockPosition {
 
     pub fn remove_enemy_hand(&mut self, index: usize) {
         self.enemy_hand.remove(index);
+    }
+
+    pub fn remove_player_hand_joker(&mut self, index: usize) {
+        self.player_hand_joker.remove(index);
     }
 }

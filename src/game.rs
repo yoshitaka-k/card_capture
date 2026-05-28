@@ -23,6 +23,7 @@ pub struct Game {
     player_deck: Deck,
     enemy_hand: CardSet,
     player_hand: CardSet,
+    player_hand_joker: Vec<Option<usize>>,
     enemy_discard: Vec<Card>,
     player_discard: Vec<Card>,
     enemy_select: Vec<bool>,
@@ -45,6 +46,7 @@ impl Game {
         self.player_deck = Deck::new(DeckType::Player);
         self.enemy_select = vec![false; MAX_HAND_SIZE];
         self.player_select = vec![false; MAX_HAND_SIZE];
+        self.player_hand_joker = vec![None; MAX_HAND_SIZE];
     }
 
     /// プレイヤーのデッキにカードを設定
@@ -361,6 +363,27 @@ impl Game {
     /// プレイヤーのデッキからカードを引く
     pub fn draw_player_card(&mut self) -> Option<Card> {
         self.player_deck.draw()
+    }
+
+    pub fn set_player_hand_joker(&mut self, index: usize, rank: usize) {
+        self.player_hand_joker[index] = Some(rank);
+    }
+
+    pub fn get_player_hand_joker(&self, index: usize) -> Option<&usize> {
+        if index < self.player_hand_joker.len() {
+            self.player_hand_joker[index].as_ref()
+        } else {
+            None
+        }
+    }
+
+    /// プレイヤーの手札から `None` の空きスロットを除去する
+    pub fn compact_player_hand_joker(&mut self) {
+        self.player_hand_joker.retain(|joker| joker.is_some());
+    }
+
+    pub fn clear_player_hand_joker(&mut self) {
+        self.player_hand_joker = vec![None; MAX_HAND_SIZE];
     }
 }
 

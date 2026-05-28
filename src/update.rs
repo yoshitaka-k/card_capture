@@ -240,6 +240,7 @@ fn visual_to_hand_index(visual_index: usize) -> usize {
 
 /// プレイヤーの手札からカードを選択するイベントを処理する
 fn player_select_event(app: &mut App, mouse_pos: Position) {
+    // プレイヤーの手札からカードを選択する
     for (visual_index, area) in app.positions.get_player_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
             let hand_index = visual_to_hand_index(visual_index);
@@ -259,6 +260,18 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
 
             update_flags(app);
 
+            break;
+        }
+    }
+
+    for (visual_index, area) in app.positions.get_player_hand_joker().iter().enumerate() {
+        if area.contains(mouse_pos) {
+            let hand_index = visual_to_hand_index(visual_index);
+            if let Some(joker_rank) = app.game.get_player_hand_joker(hand_index) {
+                app.help_text = format!("Joker rank: {}", joker_rank);
+            } else {
+                app.help_text = format!("Select Joker rank");
+            }
             break;
         }
     }

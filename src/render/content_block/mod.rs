@@ -93,12 +93,32 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
         match deck_type {
             DeckType::Enemy => {
                 app.positions.add_enemy_hand(chunk);
+                frame.render_widget(paragraph, chunk);
             }
             DeckType::Player => {
-                app.positions.add_player_hand(chunk);
+                let trump_chunks = Layout::default()
+                .direction(Direction::Vertical)
+                .constraints([
+                    Constraint::Percentage(100),
+                    Constraint::Length(3),
+                ]).split(chunk);
+
+                app.positions.add_player_hand(trump_chunks[0]);
+                frame.render_widget(paragraph, trump_chunks[0]);
+
+                // ジョーカーランク設定エリア
+
+                let joker_rank_block = Block::default()
+                    .borders(Borders::ALL)
+                    .border_style(Style::default().fg(Color::LightCyan))
+                    .padding(Padding::horizontal(1));
+
+                let joker_rank_content = Paragraph::new("Copy rank to Joker")
+                    .block(joker_rank_block);
+
+                app.positions.add_player_hand_joker(trump_chunks[1]);
+                frame.render_widget(joker_rank_content, trump_chunks[1]);
             }
         }
-
-        frame.render_widget(paragraph, chunk);
     }
 }
