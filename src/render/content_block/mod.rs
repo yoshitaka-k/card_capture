@@ -1,7 +1,11 @@
-pub mod enemy_content;
-pub mod middle_content;
-pub mod player_content;
-pub mod help_content;
+/// Enemy Content Block
+pub mod enemy;
+/// Middle Content Block
+pub mod middle;
+/// Player Content Block
+pub mod player;
+/// Help Content Block
+pub mod help;
 
 use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},

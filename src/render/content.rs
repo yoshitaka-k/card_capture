@@ -5,10 +5,10 @@ use ratatui::{
 
 use crate::{app::App};
 use crate::render::content_block::{
-    enemy_content::enemy_content,
-    middle_content::middle_content,
-    player_content::player_content,
-    help_content::help_content,
+    enemy::enemy_content,
+    middle::middle_content,
+    player::player_content,
+    help::help_content,
 };
 
 /// Render the content block
