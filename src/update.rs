@@ -154,9 +154,12 @@ fn visual_to_hand_index(visual_index: usize) -> usize {
 }
 
 /// 捕獲できるか判定する
+/// プレイヤーの選択したカードの合計ランクが選択した敵のカードの合計ランクより大きければ捕獲成功
+/// それ以外は捕獲失敗
 fn update_player_capture(app: &mut App) -> bool {
     if app.game.get_enemy_select().iter().all(|&selected| !selected)
         || app.game.get_player_select().iter().all(|&selected| !selected) {
+        app.game.set_player_cupture(false);
         return false;
     }
 
