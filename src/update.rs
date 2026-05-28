@@ -99,27 +99,7 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         // 選択したプレイヤーカードを敵の捨て札へ
         // 選択した的カードを敵デッキの一番下に追加
         if app.game.is_sacrifice() {
-            // 敵の選択したカードを敵デッキの一番下に追加
-            for (visual_index, _) in app.positions.get_enemy_hand().iter().enumerate() {
-                let hand_index = visual_to_hand_index(visual_index);
-                if app.game.is_enemy_selected(hand_index) {
-                    if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
-                        app.game.add_enemy_deck(enemy_card.clone());
-                        app.game.remove_enemy_hand_card(hand_index);
-                    }
-                }
-            }
-
-            // プレイヤーの選択したカードを敵の捨て札へ送る
-            for (visual_index, _) in app.positions.get_player_hand().iter().enumerate() {
-                let hand_index = visual_to_hand_index(visual_index);
-                if app.game.is_player_selected(hand_index) {
-                    if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
-                        app.game.add_enemy_discard(player_card.clone());
-                        app.game.remove_player_hand_card(hand_index);
-                    }
-                }
-            }
+            sacrifice_event(app);
         }
     }
 
@@ -185,6 +165,38 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
     }
 }
 
+/// 生贄イベントを処理する
+fn sacrifice_event(app: &mut App) {
+    // 敵の選択したカードを敵デッキの一番下に追加
+    for (visual_index, _) in app.positions.get_enemy_hand().iter().enumerate() {
+        let hand_index = visual_to_hand_index(visual_index);
+        if app.game.is_enemy_selected(hand_index) {
+            if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
+                app.game.add_enemy_deck(enemy_card.clone());
+                app.game.remove_enemy_hand_card(hand_index);
+            }
+        }
+    }
+
+    // プレイヤーの選択したカードを敵の捨て札へ送る
+    for (visual_index, _) in app.positions.get_player_hand().iter().enumerate() {
+        let hand_index = visual_to_hand_index(visual_index);
+        if app.game.is_player_selected(hand_index) {
+            if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
+                app.game.add_enemy_discard(player_card.clone());
+                app.game.remove_player_hand_card(hand_index);
+            }
+        }
+    }
+
+    app.game.clear_enemy_select();
+    app.game.clear_player_select();
+
+    update_sacrifice(app);
+    update_player_capture(app);
+}
+
+/// ビジュアルインデックスを手札インデックスに変換する
 #[inline]
 fn visual_to_hand_index(visual_index: usize) -> usize {
     MAX_HAND_SIZE - 1 - visual_index
