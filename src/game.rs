@@ -16,8 +16,10 @@ pub struct Game {
     player_deck: Deck,
     enemy_hand: CardSet,
     player_hand: CardSet,
-    enemy_select: Option<Card>,
+    enemy_select: Vec<bool>,
     player_select: Vec<bool>,
+    enemy_cupture: bool,
+    player_cupture: bool,
     enemy_discard: Vec<Card>,
     player_discard: Vec<Card>,
 }
@@ -30,6 +32,7 @@ impl Game {
     pub fn start(&mut self) {
         self.enemy_deck = Deck::new(DeckType::Enemy);
         self.player_deck = Deck::new(DeckType::Player);
+        self.enemy_select = vec![false; MAX_HAND_SIZE];
         self.player_select = vec![false; MAX_HAND_SIZE];
     }
 
@@ -79,6 +82,16 @@ impl Game {
         }
     }
 
+    /// 敵の手札からカードを削除
+    pub fn remove_enemy_hand_card(&mut self, index: usize) {
+        self.enemy_hand.remove(index);
+    }
+
+    /// プレイヤーの手札からカードを削除
+    pub fn remove_player_hand_card(&mut self, index: usize) {
+        self.player_hand.remove(index);
+    }
+
     /// プレイヤーの手札を取得
     pub fn get_player_hand(&self) -> &CardSet {
         &self.player_hand
@@ -94,8 +107,11 @@ impl Game {
     }
 
     /// 敵の選択したカードを追加
-    pub fn add_enemy_select(&mut self, card: Option<Card>) {
-        self.enemy_select = card;
+    pub fn add_enemy_select(&mut self, index: usize, selected: bool) {
+        for i in 0..self.enemy_select.len() {
+            self.enemy_select[i] = false;
+        }
+        self.enemy_select[index] = selected;
     }
 
     /// プレイヤーの選択したカードを追加
@@ -104,12 +120,8 @@ impl Game {
     }
 
     /// 敵の選択したカードを取得
-    pub fn get_enemy_select(&self) -> Option<&Card> {
-        if let Some(card) = &self.enemy_select {
-            Some(card)
-        } else {
-            None
-        }
+    pub fn get_enemy_select(&self) -> &Vec<bool> {
+        &self.enemy_select
     }
 
     /// プレイヤーの選択したカードを取得
@@ -117,6 +129,14 @@ impl Game {
         &self.player_select
     }
 
+    /// 敵の選択状態を取得
+    pub fn is_enemy_selected(&self, index: usize) -> bool {
+        if index < self.enemy_select.len() {
+            self.enemy_select[index]
+        } else {
+            false
+        }
+    }
     /// プレイヤーの選択状態を取得
     pub fn is_player_selected(&self, index: usize) -> bool {
         if index < self.player_select.len() {
@@ -142,10 +162,44 @@ impl Game {
     /// 敵の選択したカードの合計ランクを計算
     pub fn calc_enemy_select_rank(&self) -> usize {
         let mut rank = 0;
-        if let Some(card) = &self.enemy_select {
-            rank += card.get_calc_rank();
+        for (index, selected) in self.enemy_select.iter().enumerate() {
+            if *selected {
+                if let Some(card) = self.enemy_hand.get_card(index) {
+                    rank += card.get_calc_rank();
+                }
+            }
         }
         rank
+    }
+
+    /// 敵の選択状態をクリア
+    pub fn clear_enemy_select(&mut self) {
+        self.enemy_select = vec![false; MAX_HAND_SIZE];
+    }
+
+    /// プレイヤーの選択状態をクリア
+    pub fn clear_player_select(&mut self) {
+        self.player_select = vec![false; MAX_HAND_SIZE];
+    }
+
+    /// 敵の捕獲状態を設定
+    pub fn set_enemy_cupture(&mut self, cupture: bool) {
+        self.enemy_cupture = cupture;
+    }
+
+    /// プレイヤーの捕獲状態を設定
+    pub fn set_player_cupture(&mut self, cupture: bool) {
+        self.player_cupture = cupture;
+    }
+
+    /// 敵の捕獲状態を取得
+    pub fn is_enemy_cupture(&self) -> bool {
+        self.enemy_cupture
+    }
+
+    /// プレイヤーの捕獲状態を取得
+    pub fn is_player_cupture(&self) -> bool {
+        self.player_cupture
     }
 
     /// 敵の捨て札にカードを追加

@@ -6,6 +6,7 @@ use ratatui::{
 };
 
 use crate::app::App;
+use crate::trump::deck::DeckType;
 
 /// Render the player content block
 pub fn middle_content(app: &mut App, frame: &mut Frame, area: Rect) {
@@ -17,20 +18,7 @@ pub fn middle_content(app: &mut App, frame: &mut Frame, area: Rect) {
             Constraint::Percentage(20),
         ]).split(area);
 
-    // Player Discard Block
-    let player_discard_block = Block::default()
-        .title("Player Discard")
-        .title_style(Style::default().fg(Color::Blue).bold())
-        .borders(Borders::ALL)
-        .border_style(Style::default().fg(Color::Blue))
-        .padding(Padding::horizontal(1));
-
-    let player_discard_content = Paragraph::new(
-        format!("Player Discard count: {}", app.game.get_player_discard().len())
-    ).block(player_discard_block);
-
-    app.positions.set_player_discard(trash_chunks[0]);
-    frame.render_widget(player_discard_content, trash_chunks[0]);
+    discard_content(app, frame, trash_chunks[0], DeckType::Player);
 
     // Battle Area Block
     let middle_chunks = Layout::default()
@@ -70,18 +58,32 @@ pub fn middle_content(app: &mut App, frame: &mut Frame, area: Rect) {
         .alignment(Alignment::Center);
     frame.render_widget(enemy_content, battle_chunks[2]);
 
-    // Discard Block
-    let enemy_trash_block = Block::default()
-        .title("Discard")
-        .title_style(Style::default().fg(Color::DarkGray).bold())
+    discard_content(app, frame, trash_chunks[2], DeckType::Enemy);
+}
+
+/// Render the player discard content block
+fn discard_content(app: &mut App, frame: &mut Frame, area: Rect, deck_type: DeckType) {
+    let title: String = match deck_type {
+        DeckType::Player => "Player Discard".to_string(),
+        DeckType::Enemy => "Enemy Discard".to_string(),
+    };
+
+    // Player Discard Block
+    let discard_block = Block::default()
+        .title(title)
+        .title_style(Style::default().fg(Color::Blue).bold())
         .borders(Borders::ALL)
-        .border_style(Style::default().fg(Color::DarkGray))
+        .border_style(Style::default().fg(Color::Blue))
         .padding(Padding::horizontal(1));
 
-    let enemy_trash_content = Paragraph::new(
-        format!("Discard count: {}", app.game.get_enemy_discard().len())
-    ).block(enemy_trash_block);
+    let discard_content = Paragraph::new(match deck_type {
+        DeckType::Player => format!("Player Discard count: {}\nCupture: {}", app.game.get_player_discard().len(), app.game.is_player_cupture()),
+        DeckType::Enemy => format!("Enemy Discard count: {}\nDiscard: {}", app.game.get_enemy_discard().len(), app.game.is_enemy_cupture()),
+    }).block(discard_block);
 
-    app.positions.set_enemy_discard(trash_chunks[2]);
-    frame.render_widget(enemy_trash_content, trash_chunks[2]);
+    match deck_type {
+        DeckType::Player => app.positions.set_player_discard(area),
+        DeckType::Enemy => app.positions.set_enemy_discard(area),
+    }
+    frame.render_widget(discard_content, area);
 }

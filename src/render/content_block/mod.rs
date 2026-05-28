@@ -67,12 +67,8 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
         let text = match deck_type {
             DeckType::Enemy => {
                 if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
-                    if let Some(selected_card) = &app.game.get_enemy_select() {
-                        if card.equals(selected_card) {
-                            build_hand_text("Enemy Hand: ", Some(card), true)
-                        } else {
-                            build_hand_text("Enemy Hand: ", Some(card), false)
-                        }
+                    if app.game.is_enemy_selected(hand_index) {
+                        build_hand_text("Enemy Hand: ", Some(card), true)
                     } else {
                         build_hand_text("Enemy Hand: ", Some(card), false)
                     }
