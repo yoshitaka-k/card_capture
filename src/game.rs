@@ -22,6 +22,7 @@ pub struct Game {
     player_select: Vec<bool>,
     enemy_cupture: bool,
     player_cupture: bool,
+    discard: bool,
     sacrifice: bool,
 }
 
@@ -93,14 +94,14 @@ impl Game {
         }
     }
 
-    /// 敵の手札からカードを削除
-    pub fn remove_enemy_hand_card(&mut self, index: usize) {
-        self.enemy_hand.remove(index);
+    /// 敵の手札からカードを取り出す
+    pub fn take_enemy_hand_card(&mut self, index: usize) {
+        self.enemy_hand.take(index);
     }
 
-    /// プレイヤーの手札からカードを削除
-    pub fn remove_player_hand_card(&mut self, index: usize) {
-        self.player_hand.remove(index);
+    /// プレイヤーの手札からカードを取り出す
+    pub fn take_player_hand_card(&mut self, index: usize) {
+        self.player_hand.take(index);
     }
 
     /// プレイヤーの手札を取得
@@ -211,6 +212,16 @@ impl Game {
     /// プレイヤーの捕獲状態を取得
     pub fn is_player_cupture(&self) -> bool {
         self.player_cupture
+    }
+
+    /// 捨て札フラグを設定
+    pub fn set_discard(&mut self, discard: bool) {
+        self.discard = discard;
+    }
+
+    /// 捨て札フラグを取得
+    pub fn is_discard(&self) -> bool {
+        self.discard
     }
 
     /// 生贄フラグを設定

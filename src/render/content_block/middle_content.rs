@@ -79,9 +79,10 @@ fn discard_content(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Deck
     let discard_content = Paragraph::new(match deck_type {
         DeckType::Player => {
             format!(
-                "Player Discard count: {}\nCupture: {}",
+                "Player Discard count: {}\nCupture: {}\nDiscard: {}",
                 app.game.get_player_discard().len(),
                 app.game.is_player_cupture(),
+                app.game.is_discard(),
             )
         }
         DeckType::Enemy => {

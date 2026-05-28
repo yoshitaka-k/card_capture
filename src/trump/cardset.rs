@@ -16,7 +16,7 @@ impl CardSet {
         self.0.insert(index, Some(card));
     }
 
-    pub fn remove(&mut self, index: usize) -> Option<Card> {
+    pub fn take(&mut self, index: usize) -> Option<Card> {
         if index < self.0.len() {
             self.0.get_mut(index)?.take()
         } else {

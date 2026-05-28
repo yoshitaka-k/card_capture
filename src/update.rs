@@ -106,43 +106,13 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         }
     }
 
+
     // プレイヤーのデッキからカードを引く
     if app.positions.get_player_deck().contains(mouse_pos)
         && app.game.get_player_hand().len() < MAX_HAND_SIZE {
         if let Some(card) = app.game.draw_player_card() {
             app.game.add_player_hand(card);
         }
-    }
-
-    // プレイヤーの捨て札へ選択したカードを送る
-    if app.positions.get_player_discard().contains(mouse_pos)
-        && app.game.is_player_cupture() {
-        // 敵の選択したカードを捨て札へ送る
-        for (visual_index, _) in app.positions.get_enemy_hand().iter().enumerate() {
-            let hand_index = visual_to_hand_index(visual_index);
-            if app.game.is_enemy_selected(hand_index) {
-                if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
-                    app.game.add_player_discard(enemy_card.clone());
-                    app.game.remove_enemy_hand_card(hand_index);
-                }
-            }
-        }
-
-        // プレイヤーの選択したカードを捨て札へ送る
-        for (visual_index, _) in app.positions.get_player_hand().iter().enumerate() {
-            let hand_index = visual_to_hand_index(visual_index);
-            if app.game.is_player_selected(hand_index) {
-                if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
-                    app.game.add_player_discard(player_card.clone());
-                    app.game.remove_player_hand_card(hand_index);
-                }
-            }
-        }
-
-        app.game.clear_enemy_select();
-        app.game.clear_player_select();
-
-        update_flags(app);
     }
 
     // プレイヤーの手札からカードを選択する
@@ -164,12 +134,66 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
             break;
         }
     }
+
+    // プレイヤーの捨て札へ選択したカードを送る
+    if app.positions.get_player_discard().contains(mouse_pos) {
+        if app.game.is_player_cupture() {
+            player_capture_event(app);
+        }
+
+        if app.game.is_discard() {
+            discard_event(app);
+        }
+    }
 }
 
 /// ビジュアルインデックスを手札インデックスに変換する
 #[inline]
 fn visual_to_hand_index(visual_index: usize) -> usize {
     MAX_HAND_SIZE - 1 - visual_index
+}
+
+/// プレイヤーの捕獲イベントを処理する
+fn player_capture_event(app: &mut App) {
+    // 敵の選択したカードを捨て札へ送る
+    for (visual_index, _) in app.positions.get_enemy_hand().iter().enumerate() {
+        let hand_index = visual_to_hand_index(visual_index);
+        if app.game.is_enemy_selected(hand_index) {
+            if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
+                app.game.add_player_discard(enemy_card.clone());
+                app.game.take_enemy_hand_card(hand_index);
+            }
+        }
+    }
+
+    // プレイヤーの選択したカードを捨て札へ送る
+    for (visual_index, _) in app.positions.get_player_hand().iter().enumerate() {
+        let hand_index = visual_to_hand_index(visual_index);
+        if app.game.is_player_selected(hand_index) {
+            if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
+                app.game.add_player_discard(player_card.clone());
+                app.game.take_player_hand_card(hand_index);
+            }
+        }
+    }
+
+    clear_select(app);
+    update_flags(app);
+}
+
+fn discard_event(app: &mut App) {
+    for (visual_index, _) in app.positions.get_player_hand().iter().enumerate() {
+        let hand_index = visual_to_hand_index(visual_index);
+        if app.game.is_player_selected(hand_index) {
+            if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
+                app.game.add_player_discard(player_card.clone());
+                app.game.take_player_hand_card(hand_index);
+            }
+        }
+    }
+
+    clear_select(app);
+    update_flags(app);
 }
 
 /// 敵の捕獲イベントを処理する
@@ -179,7 +203,7 @@ fn enemy_capture_event(app: &mut App) {
         if app.game.is_enemy_selected(hand_index) {
             if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
                 app.game.add_enemy_discard(enemy_card.clone());
-                app.game.remove_enemy_hand_card(hand_index);
+                app.game.take_enemy_hand_card(hand_index);
             }
         }
     }
@@ -190,14 +214,12 @@ fn enemy_capture_event(app: &mut App) {
         if app.game.is_player_selected(hand_index) {
             if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
                 app.game.add_enemy_discard(player_card.clone());
-                app.game.remove_player_hand_card(hand_index);
+                app.game.take_player_hand_card(hand_index);
             }
         }
     }
 
-    app.game.clear_enemy_select();
-    app.game.clear_player_select();
-
+    clear_select(app);
     update_flags(app);
 }
 
@@ -209,7 +231,7 @@ fn sacrifice_event(app: &mut App) {
         if app.game.is_enemy_selected(hand_index) {
             if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
                 app.game.add_enemy_deck(enemy_card.clone());
-                app.game.remove_enemy_hand_card(hand_index);
+                app.game.take_enemy_hand_card(hand_index);
             }
         }
     }
@@ -220,21 +242,26 @@ fn sacrifice_event(app: &mut App) {
         if app.game.is_player_selected(hand_index) {
             if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
                 app.game.add_enemy_discard(player_card.clone());
-                app.game.remove_player_hand_card(hand_index);
+                app.game.take_player_hand_card(hand_index);
             }
         }
     }
 
+    clear_select(app);
+    update_flags(app);
+}
+
+/// 選択状態をクリアする
+fn clear_select(app: &mut App) {
     app.game.clear_enemy_select();
     app.game.clear_player_select();
-
-    update_flags(app);
 }
 
 /// フラグを更新する
 fn update_flags(app: &mut App) {
     update_enemy_capture(app);
     update_player_capture(app);
+    update_discard(app);
     update_sacrifice(app);
 }
 
@@ -284,6 +311,21 @@ fn update_enemy_capture(app: &mut App) -> bool {
 
     app.game.set_enemy_cupture(false);
     false
+}
+
+/// 捨て札フラグを更新する
+fn update_discard(app: &mut App) -> bool {
+    if app.game.get_enemy_select().iter().all(|&selected| selected) {
+        app.game.set_discard(false);
+        return false;
+    }
+    if app.game.get_player_select().iter().all(|&selected| !selected) {
+        app.game.set_discard(false);
+        return false;
+    }
+
+    app.game.set_discard(true);
+    true
 }
 
 /// 生贄フラグを更新する
