@@ -77,8 +77,21 @@ fn discard_content(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Deck
         .padding(Padding::horizontal(1));
 
     let discard_content = Paragraph::new(match deck_type {
-        DeckType::Player => format!("Player Discard count: {}\nCupture: {}", app.game.get_player_discard().len(), app.game.is_player_cupture()),
-        DeckType::Enemy => format!("Enemy Discard count: {}\nDiscard: {}", app.game.get_enemy_discard().len(), app.game.is_enemy_cupture()),
+        DeckType::Player => {
+            format!(
+                "Player Discard count: {}\nCupture: {}",
+                app.game.get_player_discard().len(),
+                app.game.is_player_cupture(),
+            )
+        }
+        DeckType::Enemy => {
+            format!(
+                "Enemy Discard count: {}\nDiscard: {}\nSacrifice: {}",
+                app.game.get_enemy_discard().len(),
+                app.game.is_enemy_cupture(),
+                app.game.is_sacrifice(),
+            )
+        }
     }).block(discard_block);
 
     match deck_type {

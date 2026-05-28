@@ -16,12 +16,13 @@ pub struct Game {
     player_deck: Deck,
     enemy_hand: CardSet,
     player_hand: CardSet,
+    enemy_discard: Vec<Card>,
+    player_discard: Vec<Card>,
     enemy_select: Vec<bool>,
     player_select: Vec<bool>,
     enemy_cupture: bool,
     player_cupture: bool,
-    enemy_discard: Vec<Card>,
-    player_discard: Vec<Card>,
+    sacrifice: bool,
 }
 
 impl Game {
@@ -56,6 +57,16 @@ impl Game {
     /// プレイヤーのデッキを取得
     pub fn get_player_deck(&self) -> &Deck {
         &self.player_deck
+    }
+
+    /// 敵のデッキにカードを追加
+    pub fn add_enemy_deck(&mut self, card: Card) {
+        self.enemy_deck.push(card);
+    }
+
+    /// プレイヤーのデッキにカードを追加
+    pub fn add_player_deck(&mut self, card: Card) {
+        self.player_deck.push(card);
     }
 
     /// 敵の手札にカードを追加
@@ -200,6 +211,16 @@ impl Game {
     /// プレイヤーの捕獲状態を取得
     pub fn is_player_cupture(&self) -> bool {
         self.player_cupture
+    }
+
+    /// 生贄フラグを設定
+    pub fn set_sacrifice(&mut self, sacrifice: bool) {
+        self.sacrifice = sacrifice;
+    }
+
+    /// 生贄フラグを取得
+    pub fn is_sacrifice(&self) -> bool {
+        self.sacrifice
     }
 
     /// 敵の捨て札にカードを追加

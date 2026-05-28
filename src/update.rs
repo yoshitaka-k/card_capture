@@ -85,8 +85,41 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
             } else {
                 app.game.add_enemy_select(hand_index, false);
             }
+
+            update_sacrifice(app);
             update_player_capture(app);
+
             break;
+        }
+    }
+
+    // 敵の捨て札クリックイベント処理
+    if app.positions.get_enemy_discard().contains(mouse_pos) {
+        // 生贄処理を行う
+        // 選択したプレイヤーカードを敵の捨て札へ
+        // 選択した的カードを敵デッキの一番下に追加
+        if app.game.is_sacrifice() {
+            // 敵の選択したカードを敵デッキの一番下に追加
+            for (visual_index, _) in app.positions.get_enemy_hand().iter().enumerate() {
+                let hand_index = visual_to_hand_index(visual_index);
+                if app.game.is_enemy_selected(hand_index) {
+                    if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
+                        app.game.add_enemy_deck(enemy_card.clone());
+                        app.game.remove_enemy_hand_card(hand_index);
+                    }
+                }
+            }
+
+            // プレイヤーの選択したカードを敵の捨て札へ送る
+            for (visual_index, _) in app.positions.get_player_hand().iter().enumerate() {
+                let hand_index = visual_to_hand_index(visual_index);
+                if app.game.is_player_selected(hand_index) {
+                    if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
+                        app.game.add_enemy_discard(player_card.clone());
+                        app.game.remove_player_hand_card(hand_index);
+                    }
+                }
+            }
         }
     }
 
@@ -126,6 +159,7 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         app.game.clear_enemy_select();
         app.game.clear_player_select();
 
+        update_sacrifice(app);
         update_player_capture(app);
     }
 
@@ -142,7 +176,10 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
             } else {
                 app.game.add_player_select(hand_index, false);
             }
+
+            update_sacrifice(app);
             update_player_capture(app);
+
             break;
         }
     }
@@ -175,4 +212,25 @@ fn update_player_capture(app: &mut App) -> bool {
         app.game.set_player_cupture(false);
         false
     }
+}
+
+/// 生贄フラグを更新する
+/// 敵の選択したカードが1枚、プレイヤーの選択したカードが2枚あれば生贄フラグを立てる
+fn update_sacrifice(app: &mut App) -> bool {
+    if app.game.get_enemy_select().iter().all(|&selected| !selected) {
+        app.game.set_sacrifice(false);
+        return false;
+    }
+
+    let mut sacrifice = 0;
+    for selected in app.game.get_player_select().iter() {
+        if *selected {
+            sacrifice += 1;
+        }
+    }
+
+    // app.help_text = format!("sacrifice: {}", sacrifice);
+
+    app.game.set_sacrifice(sacrifice == 2);
+    sacrifice == 2
 }
