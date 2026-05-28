@@ -1,4 +1,11 @@
-use crate::constants::MAX_HAND_SIZE;
+use crate::constants::{MAX_HAND_SIZE};
+use crate::trump::constants::{
+    JACK_FROM_RANK,
+    QUEEN_FROM_RANK,
+    KING_FROM_RANK,
+    ACE_FROM_RANK,
+    JOKER_FROM_RANK,
+};
 use crate::trump::{Card, Deck, DeckType, CardSet};
 use crate::trump::shuffle::{
     hindu_shuffle,
@@ -70,6 +77,31 @@ impl Game {
         self.player_deck.push(card);
     }
 
+    /// 敵の手札からカードをデッキに戻す
+    fn put_enemy_card_to_deck(&mut self, index: usize) {
+        if let Some(card) = self.enemy_hand.take(index) {
+            self.enemy_deck.push(card);
+        }
+    }
+
+    /// ゲーム開始終了時の敵のデッキを初期化
+    pub fn initial_end_phase_enemy_deck(&mut self) {
+        for i in 0..MAX_HAND_SIZE {
+            if let Some(card) = self.enemy_hand.get_card(i) {
+                match card.get_rank() {
+                    JACK_FROM_RANK => self.put_enemy_card_to_deck(i),
+                    QUEEN_FROM_RANK => self.put_enemy_card_to_deck(i),
+                    KING_FROM_RANK => self.put_enemy_card_to_deck(i),
+                    ACE_FROM_RANK => self.put_enemy_card_to_deck(i),
+                    JOKER_FROM_RANK => self.put_enemy_card_to_deck(i),
+                    _ => continue,
+                };
+            } else {
+                continue;
+            }
+        }
+    }
+
     /// 敵の手札にカードを追加
     pub fn add_enemy_hand(&mut self, card: Card) {
         self.enemy_hand.add(card);
@@ -102,6 +134,26 @@ impl Game {
     /// プレイヤーの手札からカードを取り出す
     pub fn take_player_hand_card(&mut self, index: usize) {
         self.player_hand.take(index);
+    }
+
+    /// 敵の手札からカードを削除
+    pub fn remove_enemy_hand_card(&mut self, index: usize) {
+        self.enemy_hand.remove(index);
+    }
+
+    /// 敵の手札から `None` の空きスロットを除去する
+    pub fn compact_enemy_hand(&mut self) {
+        self.enemy_hand.compact();
+    }
+
+    /// プレイヤーの手札から `None` の空きスロットを除去する
+    pub fn compact_player_hand(&mut self) {
+        self.player_hand.compact();
+    }
+
+    /// プレイヤーの手札からカードを削除
+    pub fn remove_player_hand_card(&mut self, index: usize) {
+        self.player_hand.remove(index);
     }
 
     /// プレイヤーの手札を取得

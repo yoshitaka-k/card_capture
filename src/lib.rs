@@ -24,6 +24,16 @@ use ratatui::layout::{
     Rect,
 };
 
+/// 表示させた後少し待機
+pub fn wait_for_dramatic_pause() {
+    std::thread::sleep(std::time::Duration::from_millis(200));
+}
+
+/// 表示させた後少し待機
+pub fn wait_for_long_dramatic_pause() {
+    std::thread::sleep(std::time::Duration::from_millis(3000));
+}
+
 /// Helper function to center a rectangle
 pub fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
     let popup_layout = Layout::default()

@@ -8,7 +8,7 @@ use ratatui::crossterm::event::{
     MouseButton,
 };
 use crate::constants::MAX_HAND_SIZE;
-use crate::app::{App, CurrentScreen};
+use crate::app::{App, CurrentScreen, GamePhase};
 
 /// キーイベントを処理する関数
 pub fn key_update(app: &mut App, key_event: KeyEvent) {
@@ -64,6 +64,41 @@ pub fn mouse_update(app: &mut App, mouse_event: MouseEvent) {
 fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
     let mouse_pos = Position::new(mouse_event.column, mouse_event.row);
 
+    match app.current_phase {
+        GamePhase::Setup => {
+            handle_enemy_draw(app, mouse_pos);
+            if app.game.get_enemy_hand().len() == MAX_HAND_SIZE {
+                app.advance_phase();
+            }
+        },
+        GamePhase::Enemy => {
+            handle_enemy_draw(app, mouse_pos);
+            if app.game.get_enemy_hand().len() == MAX_HAND_SIZE {
+                app.advance_phase();
+            }
+        },
+        GamePhase::Discard => {
+            handle_discard(app, mouse_pos);
+            if app.game.get_player_discard().len() == 0 {
+                app.advance_phase();
+            }
+        },
+        GamePhase::Draw => {
+            handle_draw(app, mouse_pos);
+            if app.game.get_player_hand().len() == MAX_HAND_SIZE {
+                app.advance_phase();
+            }
+        },
+        GamePhase::Capture => {
+            handle_capture(app, mouse_pos);
+        },
+        GamePhase::End => handle_end(app),
+        _ => {}
+    }
+}
+
+/// 敵のデッキからカードを引くイベントを処理する
+fn handle_enemy_draw(app: &mut App, mouse_pos: Position) {
     // 敵のデッキからカードを引く
     if app.positions.get_enemy_deck().contains(mouse_pos)
         && app.game.get_enemy_hand().len() < MAX_HAND_SIZE {
@@ -72,6 +107,41 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         }
     }
 
+    clear_select(app);
+    update_flags(app);
+}
+
+/// 捨て札フェーズのイベントを処理する
+fn handle_discard(app: &mut App, mouse_pos: Position) {
+    // プレイヤーの手札からカードを選択する
+    player_select_event(app, mouse_pos);
+
+    // プレイヤーの選択したカードを捨て札へ送る
+    if app.positions.get_player_discard().contains(mouse_pos) {
+        if app.game.get_player_select().iter().all(|&selected| !selected) {
+            clear_select(app);
+            update_flags(app);
+            app.advance_phase();
+            return;
+        }
+
+        for (visual_index, _) in app.positions.get_player_hand().iter().enumerate() {
+            let hand_index = visual_to_hand_index(visual_index);
+            if app.game.is_player_selected(hand_index) {
+                if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
+                    app.game.add_player_discard(player_card.clone());
+                    app.game.take_player_hand_card(hand_index);
+                }
+            }
+        }
+
+        clear_select(app);
+        update_flags(app);
+    }
+}
+
+/// 捕獲フェーズのイベントを処理する
+fn handle_capture(app: &mut App, mouse_pos: Position) {
     // 敵の手札からカードを選択する
     for (visual_index, area) in app.positions.get_enemy_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
@@ -92,10 +162,14 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         }
     }
 
+    // プレイヤーの手札からカードを選択する
+    player_select_event(app, mouse_pos);
+
     // 敵の捨て札クリックイベント処理
     if app.positions.get_enemy_discard().contains(mouse_pos) {
         if app.game.is_enemy_cupture() {
             enemy_capture_event(app);
+            app.advance_phase();
         }
 
         // 生贄処理を行う
@@ -103,10 +177,26 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         // 選択した的カードを敵デッキの一番下に追加
         if app.game.is_sacrifice() {
             sacrifice_event(app);
+            app.advance_phase();
         }
     }
 
+    // プレイヤーの捨て札へ選択したカードを送る
+    if app.positions.get_player_discard().contains(mouse_pos) {
+        if app.game.is_player_cupture() {
+            player_capture_event(app);
+            app.advance_phase();
+        }
 
+        if app.game.is_discard() {
+            discard_event(app);
+            app.advance_phase();
+        }
+    }
+}
+
+/// プレイヤーのデッキからカードを引くイベントを処理する
+fn handle_draw(app: &mut App, mouse_pos: Position) {
     // プレイヤーのデッキからカードを引く
     if app.positions.get_player_deck().contains(mouse_pos)
         && app.game.get_player_hand().len() < MAX_HAND_SIZE {
@@ -115,7 +205,26 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         }
     }
 
-    // プレイヤーの手札からカードを選択する
+    clear_select(app);
+    update_flags(app);
+}
+
+/// ゲーム終了フェーズのイベントを処理する
+fn handle_end(app: &mut App) {
+    clear_select(app);
+    update_flags(app);
+
+    app.advance_phase();
+}
+
+/// ビジュアルインデックスを手札インデックスに変換する
+#[inline]
+fn visual_to_hand_index(visual_index: usize) -> usize {
+    MAX_HAND_SIZE - 1 - visual_index
+}
+
+/// プレイヤーの手札からカードを選択するイベントを処理する
+fn player_select_event(app: &mut App, mouse_pos: Position) {
     for (visual_index, area) in app.positions.get_player_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
             let hand_index = visual_to_hand_index(visual_index);
@@ -134,23 +243,6 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
             break;
         }
     }
-
-    // プレイヤーの捨て札へ選択したカードを送る
-    if app.positions.get_player_discard().contains(mouse_pos) {
-        if app.game.is_player_cupture() {
-            player_capture_event(app);
-        }
-
-        if app.game.is_discard() {
-            discard_event(app);
-        }
-    }
-}
-
-/// ビジュアルインデックスを手札インデックスに変換する
-#[inline]
-fn visual_to_hand_index(visual_index: usize) -> usize {
-    MAX_HAND_SIZE - 1 - visual_index
 }
 
 /// プレイヤーの捕獲イベントを処理する
@@ -181,6 +273,7 @@ fn player_capture_event(app: &mut App) {
     update_flags(app);
 }
 
+/// 捨て札イベントを処理する
 fn discard_event(app: &mut App) {
     for (visual_index, _) in app.positions.get_player_hand().iter().enumerate() {
         let hand_index = visual_to_hand_index(visual_index);
@@ -259,10 +352,15 @@ fn clear_select(app: &mut App) {
 
 /// フラグを更新する
 fn update_flags(app: &mut App) {
-    update_enemy_capture(app);
-    update_player_capture(app);
-    update_discard(app);
-    update_sacrifice(app);
+    if app.is_discard_phase() {
+        update_discard(app);
+    }
+
+    if app.is_capture_phase() {
+        update_enemy_capture(app);
+        update_player_capture(app);
+        update_sacrifice(app);
+    }
 }
 
 /// 捕獲できるか判定する

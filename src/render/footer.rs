@@ -27,7 +27,7 @@ pub fn render_footer_block(app: &App, frame: &mut Frame, area: Rect) {
         .to_owned(),
         Span::styled(" | ", Style::default().fg(Color::White)),
         {
-            Span::styled("Hello!!", Style::default().fg(Color::DarkGray))
+            Span::styled(format!("Turn: {}", app.turn), Style::default().fg(Color::DarkGray))
         }
     ];
 
