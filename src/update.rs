@@ -79,14 +79,11 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         },
         GamePhase::Discard => {
             handle_discard(app, mouse_pos);
-            if app.game.get_player_discard().len() == 0 {
-                app.advance_phase();
-            }
         },
         GamePhase::Draw => {
             handle_draw(app, mouse_pos);
             if app.game.get_player_hand().len() == MAX_HAND_SIZE {
-                app.advance_phase();
+                app.schedule_phase_advance(PHASE_ADVANCE_DELAY_TICKS);
             }
         },
         GamePhase::Capture => {
@@ -100,10 +97,11 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
 /// 敵のデッキからカードを引くイベントを処理する
 fn handle_enemy_draw(app: &mut App, mouse_pos: Position) {
     // 敵のデッキからカードを引く
-    if app.positions.get_enemy_deck().contains(mouse_pos)
-        && app.game.get_enemy_hand().len() < MAX_HAND_SIZE {
-        if let Some(card) = app.game.draw_enemy_card() {
-            app.game.add_enemy_hand(card);
+    if app.positions.get_enemy_deck().contains(mouse_pos) {
+        if app.game.get_enemy_hand().len() < MAX_HAND_SIZE {
+            if let Some(card) = app.game.draw_enemy_card() {
+                app.game.add_enemy_hand(card);
+            }
         }
     }
 
@@ -121,6 +119,8 @@ fn handle_discard(app: &mut App, mouse_pos: Position) {
         if app.game.get_player_select().iter().all(|&selected| !selected) {
             clear_select(app);
             update_flags(app);
+
+            // 捨て札フェーズを終了する
             app.advance_phase();
             return;
         }
