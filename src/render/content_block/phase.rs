@@ -1,5 +1,5 @@
 use ratatui::{
-    layout::{Rect},
+    layout::{Rect, Direction, Constraint, Layout},
     style::{Color, Style},
     widgets::{Block, Borders, Paragraph, Padding},
     Frame,
@@ -17,7 +17,19 @@ pub fn phase_content(app: &mut App, frame: &mut Frame, area: Rect) {
         .padding(Padding::horizontal(1))
         .style(Style::default());
 
-    let text = match app.current_phase {
+    let inner = block.inner(area);
+    frame.render_widget(block, area);
+
+    let inner_chunks = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Fill(1),
+            Constraint::Length(1),
+            Constraint::Fill(1),
+        ])
+        .split(inner);
+
+    let paragraph = Paragraph::new(match app.current_phase {
         GamePhase::Setup => "Setup phase: Draw cards from enemy deck",
         GamePhase::SetupEnd => "Setup end phase: End Setup phase",
         GamePhase::Enemy => "Enemy phase: Draw cards from enemy deck",
@@ -25,9 +37,7 @@ pub fn phase_content(app: &mut App, frame: &mut Frame, area: Rect) {
         GamePhase::Draw => "Draw phase: Draw cards from player deck",
         GamePhase::Capture => "Capture phase: Select cards to capture enemy one and player multiple",
         GamePhase::End => "End phase: Next turn or end game",
-    };
+    });
 
-    let paragraph = Paragraph::new(text).block(block);
-
-    frame.render_widget(paragraph, area);
+    frame.render_widget(paragraph, inner_chunks[1]);
 }
