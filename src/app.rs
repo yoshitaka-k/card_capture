@@ -28,6 +28,8 @@ pub struct App {
     pub positions: BlockPosition,
     pub help_text: String,
     pub should_quit: bool,
+    /// 残り tick 数。0 になった tick で `advance_phase` する
+    pending_phase_advance_ticks: Option<u8>,
 }
 
 impl App {
@@ -40,6 +42,7 @@ impl App {
             positions: BlockPosition::default(),
             help_text: String::new(),
             should_quit: false,
+            pending_phase_advance_ticks: None,
         }
     }
 
@@ -47,7 +50,22 @@ impl App {
         self.game.start();
     }
 
-    pub fn tick(&mut self) {}
+    pub fn tick(&mut self) {
+        if let Some(ticks) = self.pending_phase_advance_ticks.as_mut() {
+            *ticks = ticks.saturating_sub(1);
+            if *ticks == 0 {
+                self.pending_phase_advance_ticks = None;
+                self.advance_phase();
+            }
+        }
+    }
+
+    /// 指定 tick 後にフェーズを進める（既に予約済みなら無視）
+    pub fn schedule_phase_advance(&mut self, delay_ticks: u8) {
+        if self.pending_phase_advance_ticks.is_none() {
+            self.pending_phase_advance_ticks = Some(delay_ticks);
+        }
+    }
 
     pub fn quit(&mut self) {
         self.should_quit = true;

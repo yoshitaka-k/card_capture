@@ -29,7 +29,7 @@ fn main() -> Result<()> {
     while !app.should_quit {
         tui.draw(&mut app)?;
         match tui.events.next()? {
-            Event::Tick => {}
+            Event::Tick => app.tick(),
             Event::Key(key_event) => key_update(&mut app, key_event),
             Event::Mouse(mouse_event) => {
                 mouse_update(&mut app, mouse_event);

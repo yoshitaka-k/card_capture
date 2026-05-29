@@ -7,7 +7,7 @@ use ratatui::crossterm::event::{
     MouseEventKind,
     MouseButton,
 };
-use crate::constants::MAX_HAND_SIZE;
+use crate::constants::{MAX_HAND_SIZE, PHASE_ADVANCE_DELAY_TICKS};
 use crate::app::{App, CurrentScreen, GamePhase};
 
 /// キーイベントを処理する関数
@@ -68,13 +68,13 @@ fn handle_mouse_up_left(app: &mut App, mouse_event: MouseEvent) {
         GamePhase::Setup => {
             handle_enemy_draw(app, mouse_pos);
             if app.game.get_enemy_hand().len() == MAX_HAND_SIZE {
-                app.advance_phase();
+                app.schedule_phase_advance(PHASE_ADVANCE_DELAY_TICKS);
             }
         },
         GamePhase::Enemy => {
             handle_enemy_draw(app, mouse_pos);
             if app.game.get_enemy_hand().len() == MAX_HAND_SIZE {
-                app.advance_phase();
+                app.schedule_phase_advance(PHASE_ADVANCE_DELAY_TICKS);
             }
         },
         GamePhase::Discard => {
