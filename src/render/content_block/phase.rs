@@ -30,11 +30,11 @@ pub fn phase_content(app: &mut App, frame: &mut Frame, area: Rect) {
         .split(inner);
 
     let paragraph = Paragraph::new(match app.current_phase {
-        GamePhase::Setup => "Setup phase: Draw cards from enemy deck",
+        GamePhase::Setup => "Setup phase: Enemy draw cards from enemy deck",
         GamePhase::SetupEnd => "Setup end phase: End Setup phase",
-        GamePhase::Enemy => "Enemy phase: Draw cards from enemy deck",
-        GamePhase::Discard => "Discard phase: Player hand to discard pile",
-        GamePhase::Draw => "Draw phase: Draw cards from player deck",
+        GamePhase::Enemy => "Enemy phase: Enemy draw cards from enemy deck",
+        GamePhase::Discard => "Player Discard phase: Player hand to discard pile",
+        GamePhase::Draw => "Player Draw phase: Player draw cards from player deck",
         GamePhase::Capture => "Capture phase: Select cards to capture enemy one and player multiple",
         GamePhase::End => "End phase: Next turn or end game",
     });
