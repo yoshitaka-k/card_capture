@@ -107,7 +107,6 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                 frame.render_widget(paragraph, trump_chunks[0]);
 
                 // ジョーカーランク設定エリア
-
                 let joker_rank_block = Block::default()
                     .borders(Borders::ALL)
                     .border_style(Style::default().fg(Color::LightCyan))

@@ -28,12 +28,11 @@ pub struct Game {
     player_discard: Vec<Card>,
     enemy_select: Vec<bool>,
     player_select: Vec<bool>,
-    enemy_suit: String,
-    player_suit: String,
     enemy_cupture: bool,
     player_cupture: bool,
     discard: bool,
     sacrifice: bool,
+    suit: String,
 }
 
 impl Game {
@@ -210,6 +209,7 @@ impl Game {
             false
         }
     }
+
     /// プレイヤーの選択状態を取得
     pub fn is_player_selected(&self, index: usize) -> bool {
         if index < self.player_select.len() {
@@ -253,36 +253,6 @@ impl Game {
     /// プレイヤーの選択状態をクリア
     pub fn clear_player_select(&mut self) {
         self.player_select = vec![false; MAX_HAND_SIZE];
-    }
-
-    /// 敵のスートを設定
-    pub fn set_enemy_suit(&mut self, suit: &str) {
-        self.enemy_suit = suit.to_string();
-    }
-
-    /// プレイヤーのスートを設定
-    pub fn set_player_suit(&mut self, suit: &str) {
-        self.player_suit = suit.to_string();
-    }
-
-    /// 敵のスートを取得
-    pub fn get_enemy_suit(&self) -> &String {
-        &self.enemy_suit
-    }
-
-    /// プレイヤーのスートを取得
-    pub fn get_player_suit(&self) -> &String {
-        &self.player_suit
-    }
-
-    /// 敵のスートをクリア
-    pub fn clear_enemy_suit(&mut self) {
-        self.enemy_suit = String::new();
-    }
-
-    /// プレイヤーのスートをクリア
-    pub fn clear_player_suit(&mut self) {
-        self.player_suit = String::new();
     }
 
     /// 敵の捕獲状態を設定
@@ -365,8 +335,31 @@ impl Game {
         self.player_deck.draw()
     }
 
-    pub fn set_player_hand_joker(&mut self, index: usize, rank: usize) {
-        self.player_hand_joker[index] = Some(rank);
+    /// スートを設定
+    pub fn set_suit(&mut self, suit: &str) {
+        if self.suit.is_empty() {
+            self.suit = suit.to_string();
+        }
+    }
+
+    /// スートを取得
+    pub fn get_suit(&self) -> &String {
+        &self.suit
+    }
+
+    /// スートをクリア
+    pub fn clear_suit(&mut self) {
+        self.suit = String::new();
+    }
+
+    /// プレイヤーの手札にジョーカーがあるかどうかを取得
+    pub fn has_player_hand_joker(&self) -> bool {
+        self.player_hand.has_joker()
+    }
+
+    /// プレイヤーの手札にジョーカーのランクを設定
+    pub fn set_player_hand_copy_joker(&mut self, joker_index: usize, index: usize, rank: usize) {
+        self.player_hand_copy_joker[joker_index][index] = Some(rank);
     }
 
     pub fn get_player_hand_joker(&self, index: usize) -> Option<&usize> {

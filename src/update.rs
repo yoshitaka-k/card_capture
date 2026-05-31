@@ -148,15 +148,15 @@ fn handle_capture(app: &mut App, mouse_pos: Position) {
             let hand_index = visual_to_hand_index(visual_index);
             if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
                 if app.game.is_enemy_selected(hand_index) {
-                    app.game.clear_enemy_suit();
+                    app.game.clear_suit();
                     app.game.add_enemy_select(hand_index, false);
                 } else {
                     let suit = card.get_suit().clone();
-                    app.game.set_enemy_suit(&suit);
+                    app.game.set_suit(&suit);
                     app.game.add_enemy_select(hand_index, true);
                 }
             } else {
-                app.game.clear_enemy_suit();
+                app.game.clear_suit();
                 app.game.add_enemy_select(hand_index, false);
             }
 
@@ -244,18 +244,17 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
     for (visual_index, area) in app.positions.get_player_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
             let hand_index = visual_to_hand_index(visual_index);
-            if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
-                if app.game.is_player_selected(hand_index) {
-                    app.game.clear_player_suit();
-                    app.game.add_player_select(hand_index, false);
-                } else {
-                    let suit = card.get_suit().clone();
-                    app.game.set_player_suit(&suit);
-                    app.game.add_player_select(hand_index, true);
-                }
-            } else {
-                app.game.clear_player_suit();
+
+            // 選択トグルを行う
+            if app.game.is_player_selected(hand_index) {
                 app.game.add_player_select(hand_index, false);
+                if app.game.get_player_select().iter().all(|&s| !s) {
+                    app.game.clear_suit();
+                }
+            } else if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
+                let suit = card.get_suit().clone();
+                app.game.add_player_select(hand_index, true);
+                app.game.set_suit(&suit);
             }
 
             update_flags(app);
@@ -380,6 +379,7 @@ fn sacrifice_event(app: &mut App) {
 fn clear_select(app: &mut App) {
     app.game.clear_enemy_select();
     app.game.clear_player_select();
+    app.game.clear_suit();
 }
 
 /// フラグを更新する
