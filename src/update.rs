@@ -257,6 +257,10 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
             if app.game.is_player_selected(hand_index) {
                 app.game.add_player_select(hand_index, false);
                 clear_suit_if_no_selection(&mut app.game);
+
+                if app.game.get_player_hand().is_joker(hand_index) {
+                    app.game.clear_player_hand_copy_joker(0);
+                }
             } else if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
                 let suit = card.get_suit().clone();
                 app.game.add_player_select(hand_index, true);
@@ -269,10 +273,9 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
 
     // ジョーカーへランクを設定する
     for (visual_index, area) in app.positions.get_player_hand_copy_joker().iter().enumerate() {
-        app.game.clear_player_hand_copy_joker(0);
-
         if !app.game.get_player_hand().has_joker() {
             app.help_text = format!("No Joker on hand");
+            app.game.clear_player_hand_copy_joker(0);
             break;
         }
 
@@ -285,6 +288,8 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
             let is_joker_selected = app.game.is_player_select_joker();
             // 選択されたカードがジョーカーかどうか
             let is_selected_joker = app.game.get_player_hand().get_card(hand_index).unwrap().is_joker();
+
+            app.game.clear_player_hand_copy_joker(0);
 
             match (has_card, is_joker_selected, is_selected_joker) {
                 // カードがあり、ジョーカーが選択されているが、選択されたカードがジョーカーでない場合
@@ -325,6 +330,7 @@ fn player_capture_event(app: &mut App) {
             if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
                 app.game.add_player_discard(enemy_card.clone());
                 app.game.take_enemy_hand_card(hand_index);
+                break;
             }
         }
     }
@@ -367,6 +373,7 @@ fn enemy_capture_event(app: &mut App) {
             if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
                 app.game.add_enemy_discard(enemy_card.clone());
                 app.game.take_enemy_hand_card(hand_index);
+                break;
             }
         }
     }
@@ -395,6 +402,7 @@ fn sacrifice_event(app: &mut App) {
             if let Some(enemy_card) = app.game.get_enemy_hand().get_card(hand_index) {
                 app.game.add_enemy_deck(enemy_card.clone());
                 app.game.take_enemy_hand_card(hand_index);
+                break;
             }
         }
     }

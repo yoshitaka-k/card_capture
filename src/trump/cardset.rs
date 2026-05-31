@@ -68,6 +68,15 @@ impl CardSet {
     }
 
     /// 手札にジョーカーがあるかどうかを取得
+    pub fn is_joker(&self, index: usize) -> bool {
+        if let Some(card) = self.get_card(index) {
+            card.is_joker()
+        } else {
+            false
+        }
+    }
+
+    /// 手札にジョーカーがあるかどうかを取得
     pub fn has_joker(&self) -> bool {
         if self.0.len() == 0 {
             return false;
