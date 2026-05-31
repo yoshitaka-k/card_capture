@@ -24,21 +24,19 @@ pub fn render(app: &mut App, frame: &mut Frame) {
     // Title Block
     render_header_block(frame, chunks[0]);
 
-    if let CurrentScreen::Main = app.current_screen {
-        // Content Block
-        render_content_block(app, frame, chunks[1]);
-    }
-
-    // Footer Block
-    render_footer_block(app, frame, chunks[2]);
-
     // popup window
     match app.current_screen {
-        CurrentScreen::Main => {}
+        CurrentScreen::Main => {
+            // Content Block
+            render_content_block(app, frame, chunks[1]);
+        }
         CurrentScreen::GameClear => {}
         CurrentScreen::GameOver => {}
         CurrentScreen::Exiting => {
             render_exit_popup_block(frame);
         }
     }
+
+    // Footer Block
+    render_footer_block(app, frame, chunks[2]);
 }

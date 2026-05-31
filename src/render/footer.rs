@@ -38,6 +38,10 @@ pub fn render_footer_block(app: &App, frame: &mut Frame, area: Rect) {
 
     let current_keys_hint = {
         match app.current_screen {
+            CurrentScreen::Exiting => Span::styled(
+                "(y) or (Enter) to yes, (n) or (Esc) to no",
+                Style::default().fg(Color::Red).bold(),
+            ),
             _ => Span::styled(
                 "(q) to exit",
                 Style::default().fg(Color::Red).bold(),

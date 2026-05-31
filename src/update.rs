@@ -30,7 +30,7 @@ pub fn key_update(app: &mut App, key_event: KeyEvent) {
                     app.should_quit = true;
                     return;
                 }
-                KeyCode::Esc | KeyCode::Char('n') | KeyCode::Char('q') => {
+                KeyCode::Esc | KeyCode::Char('n') => {
                     app.current_screen = CurrentScreen::Main;
                     return;
                 }
