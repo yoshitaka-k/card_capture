@@ -4,6 +4,8 @@ use crate::render::block_position::BlockPosition;
 /// 現在の画面を管理する列挙体
 pub enum CurrentScreen {
     Main,
+    GameClear,
+    GameOver,
     Exiting,
 }
 

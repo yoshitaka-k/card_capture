@@ -34,7 +34,9 @@ pub fn render(app: &mut App, frame: &mut Frame) {
 
     // popup window
     match app.current_screen {
-        CurrentScreen::Main => {},
+        CurrentScreen::Main => {}
+        CurrentScreen::GameClear => {}
+        CurrentScreen::GameOver => {}
         CurrentScreen::Exiting => {
             render_exit_popup_block(frame);
         }

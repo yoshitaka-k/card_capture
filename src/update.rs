@@ -22,6 +22,8 @@ pub fn key_update(app: &mut App, key_event: KeyEvent) {
                 _ => {}
             }
         }
+        CurrentScreen::GameClear => {}
+        CurrentScreen::GameOver => {}
         CurrentScreen::Exiting => {
             match key_event.code {
                 KeyCode::Enter | KeyCode::Char('y') => {
@@ -49,6 +51,8 @@ pub fn mouse_update(app: &mut App, mouse_event: MouseEvent) {
                 _ => {}
             }
         }
+        CurrentScreen::GameClear => {}
+        CurrentScreen::GameOver => {}
         CurrentScreen::Exiting => {
             match mouse_event.kind {
                 MouseEventKind::Up(MouseButton::Right) => {

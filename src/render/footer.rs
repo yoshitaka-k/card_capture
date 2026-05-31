@@ -21,8 +21,10 @@ pub fn render_footer_block(app: &App, frame: &mut Frame, area: Rect) {
     // Current Navigation Text
     let current_navigation_text = vec![
         match app.current_screen {
-            CurrentScreen::Main => Span::styled("Normal Mode", Style::default().fg(Color::Green).bold()),
-            CurrentScreen::Exiting => Span::styled("Exiting Mode", Style::default().fg(Color::LightRed).bold()),
+            CurrentScreen::Main => Span::styled("Game Playing", Style::default().fg(Color::Green).bold()),
+            CurrentScreen::GameClear => Span::styled("Game Clear", Style::default().fg(Color::Green).bold()),
+            CurrentScreen::GameOver => Span::styled("Game Over", Style::default().fg(Color::Red).bold()),
+            CurrentScreen::Exiting => Span::styled("Exiting", Style::default().fg(Color::LightRed).bold()),
         }
         .to_owned(),
         Span::styled(" | ", Style::default().fg(Color::White)),
@@ -36,14 +38,10 @@ pub fn render_footer_block(app: &App, frame: &mut Frame, area: Rect) {
 
     let current_keys_hint = {
         match app.current_screen {
-            CurrentScreen::Main => Span::styled(
+            _ => Span::styled(
                 "(q) to exit",
                 Style::default().fg(Color::Red).bold(),
-            ),
-            CurrentScreen::Exiting => Span::styled(
-                "(q) to exit",
-                Style::default().fg(Color::Red).bold(),
-            ),
+            )
         }
     };
 
