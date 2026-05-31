@@ -32,7 +32,7 @@ pub struct Game {
     player_deck: Deck,
     enemy_hand: CardSet,
     player_hand: CardSet,
-    player_hand_joker: Vec<Option<usize>>,
+    player_hand_copy_joker: [Vec<bool>; 2],
     enemy_discard: Vec<Card>,
     player_discard: Vec<Card>,
     enemy_select: Vec<bool>,
@@ -54,7 +54,7 @@ impl Game {
         self.player_deck = Deck::new(DeckType::Player);
         self.enemy_select = vec![false; MAX_HAND_SIZE];
         self.player_select = vec![false; MAX_HAND_SIZE];
-        self.player_hand_joker = vec![None; MAX_HAND_SIZE];
+        self.player_hand_copy_joker = [vec![false; MAX_HAND_SIZE], vec![false; MAX_HAND_SIZE]];
     }
 
     /// プレイヤーのデッキにカードを設定
@@ -110,7 +110,6 @@ impl Game {
                     QUEEN_FROM_RANK => self.put_enemy_card_to_deck(i),
                     KING_FROM_RANK => self.put_enemy_card_to_deck(i),
                     ACE_FROM_RANK => self.put_enemy_card_to_deck(i),
-                    JOKER_FROM_RANK => self.put_enemy_card_to_deck(i),
                     _ => continue,
                 };
             } else {
@@ -346,7 +345,7 @@ impl Game {
 
     /// スートを設定
     pub fn set_suit(&mut self, suit: &str) {
-        if self.suit.is_empty() {
+        if self.suit.is_empty() && suit != SUIT_STR_JOKER {
             self.suit = suit.to_string();
         }
     }
@@ -373,31 +372,51 @@ impl Game {
         }.to_string()
     }
 
-    /// プレイヤーの手札にジョーカーがあるかどうかを取得
-    pub fn has_player_hand_joker(&self) -> bool {
-        self.player_hand.has_joker()
+    /// 手札のジョーカーに他カードのランクの有無を設定
+    pub fn set_player_hand_copy_joker(&mut self, joker_index: usize, index: usize, selected: bool) {
+        self.player_hand_copy_joker[joker_index][index] = selected;
     }
 
-    /// プレイヤーの手札にジョーカーのランクを設定
-    pub fn set_player_hand_copy_joker(&mut self, joker_index: usize, index: usize, rank: usize) {
-        self.player_hand_copy_joker[joker_index][index] = Some(rank);
+    /// 手札のジョーカーに他カードのランクの有無を取得
+    pub fn is_player_hand_copy_joker(&self, joker_index: usize, index: usize) -> bool {
+        self.player_hand_copy_joker
+            .get(joker_index)
+            .and_then(|slots| slots.get(index))
+            .copied()
+            .unwrap_or(false)
     }
 
-    pub fn get_player_hand_joker(&self, index: usize) -> Option<&usize> {
-        if index < self.player_hand_joker.len() {
-            self.player_hand_joker[index].as_ref()
-        } else {
-            None
+    /// ジョーカーへコピー元として選ばれている手札インデックス
+    pub fn get_player_hand_copy_joker_source(&self, joker_index: usize) -> Option<usize> {
+        self.player_hand_copy_joker[joker_index]
+            .iter()
+            .position(|&selected| selected)
+    }
+
+    /// プレイヤーの選択したカードにジョーカーがあるかどうかを取得
+    pub fn is_player_select_joker(&self) -> bool {
+        for (index, selected) in self.player_select.iter().enumerate() {
+            if *selected {
+                if let Some(card) = self.player_hand.get_card(index) {
+                    if card.is_joker() {
+                        return true;
+                    }
+                }
+            }
         }
+        false
     }
 
     /// プレイヤーの手札から `None` の空きスロットを除去する
-    pub fn compact_player_hand_joker(&mut self) {
-        self.player_hand_joker.retain(|joker| joker.is_some());
+    pub fn compact_player_hand_copy_joker(&mut self, index: usize) {
+        self.player_hand_copy_joker[index].retain(|joker| *joker);
     }
 
-    pub fn clear_player_hand_joker(&mut self) {
-        self.player_hand_joker = vec![None; MAX_HAND_SIZE];
+    /// プレイヤーの手札にジョーカーのランクをクリア
+    pub fn clear_player_hand_copy_joker(&mut self, index: usize) {
+        for joker in self.player_hand_copy_joker[index].iter_mut() {
+            *joker = false;
+        }
     }
 }
 

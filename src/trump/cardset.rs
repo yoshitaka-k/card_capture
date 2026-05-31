@@ -66,4 +66,19 @@ impl CardSet {
     pub fn compact(&mut self) {
         self.0.retain(|card| card.is_some());
     }
+
+    /// 手札にジョーカーがあるかどうかを取得
+    pub fn has_joker(&self) -> bool {
+        if self.0.len() == 0 {
+            return false;
+        }
+        for card in self.0.iter() {
+            if let Some(card) = card {
+                if card.is_joker() {
+                    return true;
+                }
+            }
+        }
+        false
+    }
 }

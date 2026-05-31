@@ -30,6 +30,7 @@ pub const KING_FROM_RANK: usize = 13;
 pub const KING_TO_RANK: usize = 13;
 pub const KING_STR_RANK: &str = "K";
 
-pub const JOKER_FROM_RANK: usize = 0;
-pub const JOKER_TO_RANK: usize = 14;
+pub const JOKER1_FROM_RANK: usize = 0;
+pub const JOKER2_FROM_RANK: usize = 1;
+pub const JOKER_TO_RANK: usize = 0;
 pub const JOKER_STR_RANK: &str = "";

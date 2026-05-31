@@ -65,7 +65,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
             .padding(Padding::horizontal(1))
             .style(Style::default());
 
-        let paragraph = Paragraph::new(match deck_type {
+        let text = match deck_type {
             DeckType::Enemy => {
                 if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
                     if app.game.is_enemy_selected(hand_index) {
@@ -78,7 +78,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                 }
             }
             DeckType::Player => {
-                if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
+                let mut text = if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
                     if app.game.is_player_selected(hand_index) {
                         build_hand_text("Player Hand: ", Some(card), true)
                     } else {
@@ -86,9 +86,31 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                     }
                 } else {
                     build_hand_text("Player Hand: ", None, false)
+                };
+
+                if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
+                    if card.is_joker() {
+                        if let Some(copy_label) = app
+                            .game
+                            .get_player_hand_copy_joker_source(0)
+                            .and_then(|index| {
+                                app.game
+                                    .get_player_hand()
+                                    .get_card(index)
+                                    .map(|card| format!("Copy from: {}", card.get_name()))
+                            })
+                        {
+                            text.push('\n');
+                            text.push_str(&copy_label);
+                        }
+                    }
                 }
+
+                text
             }
-        }).block(block);
+        };
+
+        let paragraph = Paragraph::new(text).block(block);
 
         match deck_type {
             DeckType::Enemy => {
@@ -112,10 +134,20 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                     .border_style(Style::default().fg(Color::LightCyan))
                     .padding(Padding::horizontal(1));
 
-                let joker_rank_content = Paragraph::new("Copy rank to Joker")
+                let joker_rank_label = if app.game.is_player_hand_copy_joker(0, hand_index) {
+                    app.game
+                        .get_player_hand()
+                        .get_card(hand_index)
+                        .map(|card| format!("> {}", card.get_name()))
+                        .unwrap_or_else(|| "Copy rank to Joker".to_string())
+                } else {
+                    "Copy rank to Joker".to_string()
+                };
+
+                let joker_rank_content = Paragraph::new(joker_rank_label)
                     .block(joker_rank_block);
 
-                app.positions.add_player_hand_joker(trump_chunks[1]);
+                app.positions.add_player_hand_copy_joker(trump_chunks[1]);
                 frame.render_widget(joker_rank_content, trump_chunks[1]);
             }
         }

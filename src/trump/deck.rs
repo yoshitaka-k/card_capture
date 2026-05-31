@@ -22,9 +22,8 @@ impl Deck {
                         cards.push(Card::new(suit, rank));
                     }
                 }
-                for _ in 0..2 {
-                    cards.push(Card::new("j", 0));
-                }
+                cards.push(Card::new("j", 0));
+                cards.push(Card::new("j", 1));
             }
             DeckType::Enemy => {
                 for suit in ["h", "d", "c", "s"] {

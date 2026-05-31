@@ -28,7 +28,6 @@ use crate::trump::constants::{
     KING_TO_RANK,
 
     JOKER_STR_RANK,
-    JOKER_FROM_RANK,
     JOKER_TO_RANK,
 };
 use std::fmt::Write as _;
@@ -50,11 +49,18 @@ impl Card {
     }
 
     pub fn get_rank(&self) -> usize {
+        if self.is_joker() {
+            return 0;
+        }
         self.rank
     }
 
     pub fn equals(&self, other: &Card) -> bool {
         self.suit == other.suit && self.rank == other.rank
+    }
+
+    pub fn is_joker(&self) -> bool {
+        self.suit == SUIT_STR_JOKER
     }
 
     /// 手札表示用の並び: スート（h → d → c → s → j）、同スート内はランクの数値順。
@@ -72,24 +78,47 @@ impl Card {
     }
 
     pub fn get_calc_rank(&self) -> usize {
-        match self.rank {
-            JACK_FROM_RANK => JACK_TO_RANK,
-            QUEEN_FROM_RANK => QUEEN_TO_RANK,
-            KING_FROM_RANK => KING_TO_RANK,
-            ACE_FROM_RANK => ACE_TO_RANK,
-            JOKER_FROM_RANK => JOKER_TO_RANK,
-            _ => self.rank,
+        match self.suit.as_str() {
+            SUIT_STR_JOKER => {
+                JOKER_TO_RANK
+            }
+            _ => {
+                match self.rank {
+                    JACK_FROM_RANK => JACK_TO_RANK,
+                    QUEEN_FROM_RANK => QUEEN_TO_RANK,
+                    KING_FROM_RANK => KING_TO_RANK,
+                    ACE_FROM_RANK => ACE_TO_RANK,
+                    _ => self.rank,
+                }
+            }
         }
     }
 
+    pub fn get_disp_suit(&self) -> String {
+        match self.suit.as_str() {
+            SUIT_STR_HART => SUIT_ICON_HART,
+            SUIT_STR_DIAMOND => SUIT_ICON_DIAMOND,
+            SUIT_STR_CLOVER => SUIT_ICON_CLOVER,
+            SUIT_STR_SPADE => SUIT_ICON_SPADE,
+            SUIT_STR_JOKER => SUIT_ICON_JOKER,
+            _ => "?",
+        }.to_string()
+    }
+
     pub fn get_disp_rank(&self) -> String {
-        match self.rank {
-            ACE_FROM_RANK => ACE_STR_RANK.to_string(),
-            JACK_FROM_RANK => JACK_STR_RANK.to_string(),
-            QUEEN_FROM_RANK => QUEEN_STR_RANK.to_string(),
-            KING_FROM_RANK => KING_STR_RANK.to_string(),
-            JOKER_FROM_RANK => JOKER_STR_RANK.to_string(),
-            _ => self.rank.to_string(),
+        match self.suit.as_str() {
+            SUIT_STR_JOKER => {
+                JOKER_STR_RANK.to_string()
+            }
+            _ => {
+                match self.rank {
+                    ACE_FROM_RANK => ACE_STR_RANK.to_string(),
+                    JACK_FROM_RANK => JACK_STR_RANK.to_string(),
+                    QUEEN_FROM_RANK => QUEEN_STR_RANK.to_string(),
+                    KING_FROM_RANK => KING_STR_RANK.to_string(),
+                    _ => format!("{}", self.rank),
+                }
+            }
         }
     }
 
@@ -105,14 +134,20 @@ impl Card {
 
         let mut name = String::with_capacity(4);
         name.push_str(suit);
-        match self.rank {
-            ACE_FROM_RANK => name.push_str(ACE_STR_RANK),
-            JACK_FROM_RANK => name.push_str(JACK_STR_RANK),
-            QUEEN_FROM_RANK => name.push_str(QUEEN_STR_RANK),
-            KING_FROM_RANK => name.push_str(KING_STR_RANK),
-            JOKER_FROM_RANK => name.push_str(JOKER_STR_RANK),
+        match self.suit.as_str() {
+            SUIT_STR_JOKER => {
+                name.push_str(JOKER_STR_RANK);
+            }
             _ => {
-                let _ = write!(&mut name, "{}", self.rank);
+                match self.rank {
+                    ACE_FROM_RANK => name.push_str(ACE_STR_RANK),
+                    JACK_FROM_RANK => name.push_str(JACK_STR_RANK),
+                    QUEEN_FROM_RANK => name.push_str(QUEEN_STR_RANK),
+                    KING_FROM_RANK => name.push_str(KING_STR_RANK),
+                    _ => {
+                        let _ = write!(&mut name, "{}", self.rank);
+                    }
+                }
             }
         }
         name

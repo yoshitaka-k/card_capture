@@ -17,7 +17,19 @@ pub fn help_content(app: &mut App, frame: &mut Frame, area: Rect) {
         .padding(Padding::horizontal(1))
         .style(Style::default());
 
-    let text = if app.help_text.is_empty() {
+    let joker_help = app
+        .game
+        .get_player_hand_copy_joker_source(0)
+        .and_then(|index| {
+            app.game
+                .get_player_hand()
+                .get_card(index)
+                .map(|card| format!("Joker from card: {}", card.get_name()))
+        });
+
+    let text = if let Some(ref msg) = joker_help {
+        msg.as_str()
+    } else if app.help_text.is_empty() {
         "Help content: Help text"
     } else {
         &app.help_text

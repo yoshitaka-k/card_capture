@@ -171,11 +171,11 @@ fn handle_capture(app: &mut App, mouse_pos: Position) {
     // プレイヤーの手札からカードを選択する
     player_select_event(app, mouse_pos);
 
-    if app.game.get_suit().is_empty() {
-        app.help_text = format!("No selected suit");
-    } else {
-        app.help_text = format!("Selected suit: {}", app.game.get_disp_suit());
-    }
+    // if app.game.get_suit().is_empty() {
+    //     app.help_text = format!("No selected suit");
+    // } else {
+    //     app.help_text = format!("Selected suit: {}", app.game.get_disp_suit());
+    // }
 
     // 敵の捨て札クリックイベント処理
     if app.positions.get_enemy_discard().contains(mouse_pos) {
@@ -269,13 +269,31 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
         }
     }
 
-    for (visual_index, area) in app.positions.get_player_hand_joker().iter().enumerate() {
+    // ジョーカーへランクを設定する
+    for (visual_index, area) in app.positions.get_player_hand_copy_joker().iter().enumerate() {
+        let hand_index = visual_to_hand_index(visual_index);
+        if !app.game.get_player_hand().has_joker() {
+            app.help_text = format!("No Joker on hand");
+            break;
+        }
+
         if area.contains(mouse_pos) {
-            let hand_index = visual_to_hand_index(visual_index);
-            if let Some(joker_rank) = app.game.get_player_hand_joker(hand_index) {
-                app.help_text = format!("Joker rank: {}", joker_rank);
-            } else {
-                app.help_text = format!("Select Joker rank");
+            let has_card = app.game.get_player_hand().get_card(hand_index).is_some();
+            let is_joker_selected = app.game.is_player_select_joker();
+
+            app.game.clear_player_hand_copy_joker(0);
+
+            match (has_card, is_joker_selected) {
+                (true, true) => {
+                    app.help_text.clear();
+                    app.game.set_player_hand_copy_joker(0, hand_index, true);
+                }
+                (true, false) => {
+                    app.help_text = format!("Joker not selected");
+                }
+                (false, _) => {
+                    app.help_text = format!("Card not found");
+                }
             }
             break;
         }
@@ -316,8 +334,7 @@ fn discard_event(app: &mut App) {
         let hand_index = visual_to_hand_index(visual_index);
         if app.game.is_player_selected(hand_index) {
             if let Some(player_card) = app.game.get_player_hand().get_card(hand_index) {
-                app.game.add_player_discard(player_card.clone());
-                app.game.take_player_hand_card(hand_index);
+                app.help_text = format!("Joker rank: {}", player_card.get_rank());
             }
         }
     }
