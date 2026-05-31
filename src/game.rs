@@ -4,7 +4,16 @@ use crate::trump::constants::{
     QUEEN_FROM_RANK,
     KING_FROM_RANK,
     ACE_FROM_RANK,
-    JOKER_FROM_RANK,
+    SUIT_STR_HART,
+    SUIT_STR_DIAMOND,
+    SUIT_STR_CLOVER,
+    SUIT_STR_SPADE,
+    SUIT_STR_JOKER,
+    SUIT_ICON_HART,
+    SUIT_ICON_DIAMOND,
+    SUIT_ICON_CLOVER,
+    SUIT_ICON_SPADE,
+    SUIT_ICON_JOKER,
 };
 use crate::trump::{Card, Deck, DeckType, CardSet};
 use crate::trump::shuffle::{
@@ -350,6 +359,18 @@ impl Game {
     /// スートをクリア
     pub fn clear_suit(&mut self) {
         self.suit = String::new();
+    }
+
+    /// スートを表示用に取得
+    pub fn get_disp_suit(&self) -> String {
+        match self.suit.as_str() {
+            SUIT_STR_HART => SUIT_ICON_HART,
+            SUIT_STR_DIAMOND => SUIT_ICON_DIAMOND,
+            SUIT_STR_CLOVER => SUIT_ICON_CLOVER,
+            SUIT_STR_SPADE => SUIT_ICON_SPADE,
+            SUIT_STR_JOKER => SUIT_ICON_JOKER,
+            _ => "?",
+        }.to_string()
     }
 
     /// プレイヤーの手札にジョーカーがあるかどうかを取得

@@ -146,13 +146,20 @@ fn handle_capture(app: &mut App, mouse_pos: Position) {
     for (visual_index, area) in app.positions.get_enemy_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
             let hand_index = visual_to_hand_index(visual_index);
+
+            // 選択トグルを行う
             if app.game.is_enemy_selected(hand_index) {
                 app.game.add_enemy_select(hand_index, false);
                 clear_suit_if_no_selection(&mut app.game);
             } else if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
                 let suit = card.get_suit().clone();
                 app.game.add_enemy_select(hand_index, true);
-                app.game.set_suit(&suit);
+
+                // 敵手札は1枚のみ選択可のため、切り替え時もスートを更新する
+                if app.game.get_player_select().iter().all(|&s| !s) {
+                    app.game.clear_suit();
+                    app.game.set_suit(&suit);
+                }
             }
 
             update_flags(app);
@@ -163,6 +170,12 @@ fn handle_capture(app: &mut App, mouse_pos: Position) {
 
     // プレイヤーの手札からカードを選択する
     player_select_event(app, mouse_pos);
+
+    if app.game.get_suit().is_empty() {
+        app.help_text = format!("No selected suit");
+    } else {
+        app.help_text = format!("Selected suit: {}", app.game.get_disp_suit());
+    }
 
     // 敵の捨て札クリックイベント処理
     if app.positions.get_enemy_discard().contains(mouse_pos) {
