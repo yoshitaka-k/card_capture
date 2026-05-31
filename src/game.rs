@@ -101,7 +101,7 @@ impl Game {
         }
     }
 
-    /// ゲーム開始終了時の敵のデッキを初期化
+    /// ゲーム開始のセットアップフェース終了時の敵のデッキを初期化
     pub fn initial_end_phase_enemy_deck(&mut self) {
         for i in 0..MAX_HAND_SIZE {
             if let Some(card) = self.enemy_hand.get_card(i) {

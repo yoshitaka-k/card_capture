@@ -175,14 +175,10 @@ fn handle_capture(app: &mut App, mouse_pos: Position) {
     // プレイヤーの手札からカードを選択する
     player_select_event(app, mouse_pos);
 
-    // if app.game.get_suit().is_empty() {
-    //     app.help_text = format!("No selected suit");
-    // } else {
-    //     app.help_text = format!("Selected suit: {}", app.game.get_disp_suit());
-    // }
-
     // 敵の捨て札クリックイベント処理
     if app.positions.get_enemy_discard().contains(mouse_pos) {
+        // 敵の捕獲処理を行う
+        // 敵カードの右端1枚と、プレイヤーの選択したカード1枚を敵の捨て札へ送る
         if app.game.is_enemy_cupture() {
             enemy_capture_event(app);
             app.advance_phase();
