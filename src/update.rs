@@ -269,27 +269,43 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
 
     // ジョーカーへランクを設定する
     for (visual_index, area) in app.positions.get_player_hand_copy_joker().iter().enumerate() {
-        let hand_index = visual_to_hand_index(visual_index);
+        app.game.clear_player_hand_copy_joker(0);
+
         if !app.game.get_player_hand().has_joker() {
             app.help_text = format!("No Joker on hand");
             break;
         }
 
         if area.contains(mouse_pos) {
+            let hand_index = visual_to_hand_index(visual_index);
+
+            // カードがあるかどうか
             let has_card = app.game.get_player_hand().get_card(hand_index).is_some();
+            // ジョーカーが選択されているかどうか
             let is_joker_selected = app.game.is_player_select_joker();
+            // 選択されたカードがジョーカーかどうか
+            let is_selected_joker = app.game.get_player_hand().get_card(hand_index).unwrap().is_joker();
 
-            app.game.clear_player_hand_copy_joker(0);
-
-            match (has_card, is_joker_selected) {
-                (true, true) => {
+            match (has_card, is_joker_selected, is_selected_joker) {
+                // カードがあり、ジョーカーが選択されているが、選択されたカードがジョーカーでない場合
+                (true, true, false) => {
                     app.help_text.clear();
                     app.game.set_player_hand_copy_joker(0, hand_index, true);
                 }
-                (true, false) => {
+                // カードがあり、ジョーカーが選択されていないが、選択されたカードがジョーカーの場合
+                (true, false, true) => {
                     app.help_text = format!("Joker not selected");
                 }
-                (false, _) => {
+                // カードがあり、ジョーカーが選択されていないが、選択されたカードがジョーカーでない場合
+                (true, false, false) => {
+                    app.help_text = format!("Joker not selected");
+                }
+                // 選択されたカードがジョーカーの場合
+                (_, _, true) => {
+                    app.help_text = format!("This card is a Joker, so it cannot be selected as a copy source");
+                }
+                // カードがない場合
+                (false, _, _) => {
                     app.help_text = format!("Card not found");
                 }
             }
