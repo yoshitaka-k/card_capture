@@ -146,18 +146,13 @@ fn handle_capture(app: &mut App, mouse_pos: Position) {
     for (visual_index, area) in app.positions.get_enemy_hand().iter().enumerate() {
         if area.contains(mouse_pos) {
             let hand_index = visual_to_hand_index(visual_index);
-            if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
-                if app.game.is_enemy_selected(hand_index) {
-                    app.game.clear_suit();
-                    app.game.add_enemy_select(hand_index, false);
-                } else {
-                    let suit = card.get_suit().clone();
-                    app.game.set_suit(&suit);
-                    app.game.add_enemy_select(hand_index, true);
-                }
-            } else {
-                app.game.clear_suit();
+            if app.game.is_enemy_selected(hand_index) {
                 app.game.add_enemy_select(hand_index, false);
+                clear_suit_if_no_selection(&mut app.game);
+            } else if let Some(card) = app.game.get_enemy_hand().get_card(hand_index) {
+                let suit = card.get_suit().clone();
+                app.game.add_enemy_select(hand_index, true);
+                app.game.set_suit(&suit);
             }
 
             update_flags(app);
@@ -248,9 +243,7 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
             // 選択トグルを行う
             if app.game.is_player_selected(hand_index) {
                 app.game.add_player_select(hand_index, false);
-                if app.game.get_player_select().iter().all(|&s| !s) {
-                    app.game.clear_suit();
-                }
+                clear_suit_if_no_selection(&mut app.game);
             } else if let Some(card) = app.game.get_player_hand().get_card(hand_index) {
                 let suit = card.get_suit().clone();
                 app.game.add_player_select(hand_index, true);
@@ -373,6 +366,19 @@ fn sacrifice_event(app: &mut App) {
 
     clear_select(app);
     update_flags(app);
+}
+
+/// 敵またはプレイヤーの手札に選択があるか
+fn has_any_selection(game: &crate::game::Game) -> bool {
+    game.get_enemy_select().iter().any(|&s| s)
+        || game.get_player_select().iter().any(|&s| s)
+}
+
+/// 選択がなくなったら suit をクリアする
+fn clear_suit_if_no_selection(game: &mut crate::game::Game) {
+    if !has_any_selection(game) {
+        game.clear_suit();
+    }
 }
 
 /// 選択状態をクリアする
