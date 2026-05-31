@@ -263,8 +263,6 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
                 app.game.set_suit(&suit);
             }
 
-            update_flags(app);
-
             break;
         }
     }
@@ -298,6 +296,8 @@ fn player_select_event(app: &mut App, mouse_pos: Position) {
             break;
         }
     }
+
+    update_flags(app);
 }
 
 /// プレイヤーの捕獲イベントを処理する
@@ -437,6 +437,14 @@ fn update_flags(app: &mut App) {
 fn update_player_capture(app: &mut App) -> bool {
     if app.game.get_enemy_select().iter().all(|&selected| !selected)
         || app.game.get_player_select().iter().all(|&selected| !selected) {
+        app.game.set_player_cupture(false);
+        return false;
+    }
+
+    // ジョーカーが選択されている場合、コピー元が選択されていなければ捕獲失敗
+    if app.game.is_player_select_joker()
+        && app.game.get_player_hand_copy_joker_source(0).is_none()
+    {
         app.game.set_player_cupture(false);
         return false;
     }

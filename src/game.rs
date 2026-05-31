@@ -230,7 +230,16 @@ impl Game {
     /// プレイヤーの選択したカードの合計ランクを計算
     pub fn calc_player_select_rank(&self) -> usize {
         let mut rank = 0;
+        // プレイヤーの選択したカードの合計ランクを計算
         for (index, selected) in self.player_select.iter().enumerate() {
+            if *selected {
+                if let Some(card) = self.player_hand.get_card(index) {
+                    rank += card.get_calc_rank();
+                }
+            }
+        }
+        // コピーしたジョーカーのランクを加算
+        for (index, selected) in self.player_hand_copy_joker[0].iter().enumerate() {
             if *selected {
                 if let Some(card) = self.player_hand.get_card(index) {
                     rank += card.get_calc_rank();
