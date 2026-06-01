@@ -70,8 +70,12 @@ fn discard_content(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Deck
     }).block(discard_block);
 
     match deck_type {
-        DeckType::Player => app.positions.set_player_discard(area),
-        DeckType::Enemy => app.positions.set_enemy_discard(area),
+        DeckType::Player => {
+            app.positions.set_player_discard(area);
+        }
+        DeckType::Enemy => {
+            app.positions.set_enemy_discard(area);
+        }
     }
 
     frame.render_widget(discard_content, area);

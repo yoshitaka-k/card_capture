@@ -41,6 +41,7 @@ pub struct Game {
     player_cupture: bool,
     discard: bool,
     sacrifice: bool,
+    gameover: bool,
     suit: String,
 }
 
@@ -52,9 +53,22 @@ impl Game {
     pub fn start(&mut self) {
         self.enemy_deck = Deck::new(DeckType::Enemy);
         self.player_deck = Deck::new(DeckType::Player);
+
+        self.enemy_discard = Vec::new();
+        self.player_discard = Vec::new();
+
+        self.enemy_hand = CardSet::new();
+        self.player_hand = CardSet::new();
+        self.player_hand_copy_joker = [vec![false; MAX_HAND_SIZE], vec![false; MAX_HAND_SIZE]];
+
         self.enemy_select = vec![false; MAX_HAND_SIZE];
         self.player_select = vec![false; MAX_HAND_SIZE];
-        self.player_hand_copy_joker = [vec![false; MAX_HAND_SIZE], vec![false; MAX_HAND_SIZE]];
+
+        self.enemy_cupture = false;
+        self.player_cupture = false;
+        self.discard = false;
+        self.sacrifice = false;
+        self.gameover = false;
     }
 
     /// プレイヤーのデッキにカードを設定
@@ -426,6 +440,16 @@ impl Game {
         for joker in self.player_hand_copy_joker[index].iter_mut() {
             *joker = false;
         }
+    }
+
+    /// ゲームオーバーフラグを設定
+    pub fn set_gameover(&mut self, gameover: bool) {
+        self.gameover = gameover;
+    }
+
+    /// ゲームオーバーフラグを取得
+    pub fn is_gameover(&self) -> bool {
+        self.gameover
     }
 }
 

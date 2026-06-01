@@ -63,6 +63,16 @@ impl Card {
         self.suit == SUIT_STR_JOKER
     }
 
+    pub fn is_ace_card(&self) -> bool {
+        self.rank == ACE_FROM_RANK
+    }
+
+    pub fn is_face_card(&self) -> bool {
+        self.rank == JACK_FROM_RANK
+        || self.rank == QUEEN_FROM_RANK
+        || self.rank == KING_FROM_RANK
+    }
+
     /// 手札表示用の並び: スート（h → d → c → s → j）、同スート内はランクの数値順。
     pub fn sort_tuple(&self) -> (u8, u16) {
         let suit = match self.suit.as_str() {

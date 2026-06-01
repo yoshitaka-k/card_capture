@@ -16,8 +16,6 @@ fn main() -> Result<()> {
     let mut app = App::new();
 
     app.start();
-    app.game.shuffle_enemy_deck();
-    app.game.shuffle_player_deck();
 
     let backend = CrosstermBackend::new(std::io::stderr());
     let terminal = Terminal::new(backend)?;

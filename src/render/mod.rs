@@ -10,3 +10,5 @@ pub mod block_position;
 pub mod content_block;
 /// Render the popup block
 pub mod popup;
+/// Render the gameover block
+pub mod gameover;

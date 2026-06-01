@@ -50,6 +50,11 @@ impl App {
 
     pub fn start(&mut self) {
         self.game.start();
+
+        self.game.shuffle_enemy_deck();
+        self.game.shuffle_player_deck();
+
+        self.turn = 1;
     }
 
     pub fn tick(&mut self) {

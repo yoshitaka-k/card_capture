@@ -1,6 +1,6 @@
 [package]
 name = "card_capture"
-version = "0.17.3"
+version = "0.19.0"
 edition = "2024"
 authors = ["yoshitaka-k"]
 description = "Card Capture"
@@ -20,4 +20,6 @@ strip = true
 
 [dependencies]
 color-eyre = "0.6.5"
+figlet-rs = "1.0.0"
+getset = "0.1.6"
 ratatui = "0.30.0"
