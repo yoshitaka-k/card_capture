@@ -502,9 +502,16 @@ fn update_enemy_capture(app: &mut App) -> bool {
         .iter().filter(|&&selected| selected)
         .count();
 
+    // 1枚ずつ選択されてる
     if enemy_cnt == 1 && player_cnt == 1 {
-        app.game.set_enemy_cupture(true);
-        return true;
+        // 敵カードの0番目が選択されているか確認
+        if app.game.is_enemy_selected(0) {
+            app.game.set_enemy_cupture(true);
+            return true;
+        }
+
+        app.game.set_enemy_cupture(false);
+        return false;
     }
 
     app.game.set_enemy_cupture(false);
