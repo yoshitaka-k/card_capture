@@ -9,6 +9,8 @@ use ratatui::crossterm::event::{
 };
 use crate::constants::{MAX_HAND_SIZE, PHASE_ADVANCE_DELAY_TICKS};
 use crate::app::{App, CurrentScreen, GamePhase};
+use crate::handle::flags::update_flags;
+use crate::handle::shared::{clear_select, clear_suit_if_no_selection, visual_to_hand_index};
 
 /// キーイベントを処理する関数
 pub fn key_update(app: &mut App, key_event: KeyEvent) {
@@ -265,12 +267,6 @@ fn handle_end(app: &mut App) {
     }
 }
 
-/// ビジュアルインデックスを手札インデックスに変換する
-#[inline]
-fn visual_to_hand_index(visual_index: usize) -> usize {
-    MAX_HAND_SIZE - 1 - visual_index
-}
-
 /// プレイヤーの手札からカードを選択するイベントを処理する
 fn player_select_event(app: &mut App, mouse_pos: Position) {
     // プレイヤーの手札からカードを選択する
@@ -456,131 +452,4 @@ fn sacrifice_event(app: &mut App) {
 
     clear_select(app);
     update_flags(app);
-}
-
-/// 敵またはプレイヤーの手札に選択があるか
-fn has_any_selection(game: &crate::game::Game) -> bool {
-    game.get_enemy_select().iter().any(|&s| s)
-        || game.get_player_select().iter().any(|&s| s)
-}
-
-/// 選択がなくなったら suit をクリアする
-fn clear_suit_if_no_selection(game: &mut crate::game::Game) {
-    if !has_any_selection(game) {
-        game.clear_suit();
-    }
-}
-
-/// 選択状態をクリアする
-fn clear_select(app: &mut App) {
-    app.game.clear_enemy_select();
-    app.game.clear_player_select();
-    app.game.clear_suit();
-}
-
-/// フラグを更新する
-fn update_flags(app: &mut App) {
-    if app.is_discard_phase() {
-        update_discard(app);
-    }
-
-    if app.is_capture_phase() {
-        update_enemy_capture(app);
-        update_player_capture(app);
-        update_sacrifice(app);
-    }
-}
-
-/// 捕獲できるか判定する
-/// プレイヤーの選択したカードの合計ランクが選択した敵のカードの合計ランクより大きければ捕獲成功
-/// それ以外は捕獲失敗
-fn update_player_capture(app: &mut App) -> bool {
-    if app.game.get_enemy_select().iter().all(|&selected| !selected)
-        || app.game.get_player_select().iter().all(|&selected| !selected) {
-        app.game.set_player_cupture(false);
-        return false;
-    }
-
-    // ジョーカーが選択されている場合、コピー元が選択されていなければ捕獲失敗
-    if app.game.is_player_select_joker()
-        && app.game.get_player_hand_copy_joker_source(0).is_none()
-    {
-        app.game.set_player_cupture(false);
-        return false;
-    }
-
-    let player_select_rank = app.game.calc_player_select_rank();
-    let enemy_select_rank = app.game.calc_enemy_select_rank();
-
-    if player_select_rank >= enemy_select_rank {
-        app.game.set_player_cupture(true);
-        true
-    } else {
-        app.game.set_player_cupture(false);
-        false
-    }
-}
-
-/// 敵の捕獲フラグを更新する
-/// 敵の手札の右端選択と、プレイヤーの手札の1枚選択があれば敵の捕獲フラグを立てる
-fn update_enemy_capture(app: &mut App) -> bool {
-    if app.game.get_enemy_select().iter().all(|&selected| !selected)
-        || app.game.get_player_select().iter().all(|&selected| !selected) {
-        app.game.set_enemy_cupture(false);
-        return false;
-    }
-
-    let enemy_cnt = app.game.get_enemy_select()
-        .iter().filter(|&&selected| selected)
-        .count();
-
-    let player_cnt = app.game.get_player_select()
-        .iter().filter(|&&selected| selected)
-        .count();
-
-    // 1枚ずつ選択されてる
-    if enemy_cnt == 1 && player_cnt == 1 {
-        // 敵カードの0番目が選択されているか確認
-        if app.game.is_enemy_selected(0) {
-            app.game.set_enemy_cupture(true);
-            return true;
-        }
-
-        app.game.set_enemy_cupture(false);
-        return false;
-    }
-
-    app.game.set_enemy_cupture(false);
-    false
-}
-
-/// 捨て札フラグを更新する
-fn update_discard(app: &mut App) -> bool {
-    if app.game.get_enemy_select().iter().all(|&selected| selected) {
-        app.game.set_discard(false);
-        return false;
-    }
-    if app.game.get_player_select().iter().all(|&selected| !selected) {
-        app.game.set_discard(false);
-        return false;
-    }
-
-    app.game.set_discard(true);
-    true
-}
-
-/// 生贄フラグを更新する
-/// 敵の選択したカードが1枚、プレイヤーの選択したカードが2枚あれば生贄フラグを立てる
-fn update_sacrifice(app: &mut App) -> bool {
-    if app.game.get_enemy_select().iter().all(|&selected| !selected) {
-        app.game.set_sacrifice(false);
-        return false;
-    }
-
-    let cnt = app.game.get_player_select()
-        .iter().filter(|&&selected| selected)
-        .count();
-
-    app.game.set_sacrifice(cnt == 2);
-    cnt == 2
 }

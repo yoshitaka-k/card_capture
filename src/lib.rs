@@ -12,6 +12,8 @@ pub mod tui;
 pub mod render;
 /// Application updater
 pub mod update;
+/// Game input handlers
+pub mod handle;
 /// Trump
 pub mod trump;
 /// Game
