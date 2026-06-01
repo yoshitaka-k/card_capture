@@ -1,3 +1,6 @@
+pub mod actions;
+pub mod capture;
+pub mod discard;
 pub mod draw;
 pub mod end;
 pub mod enemy_draw;
