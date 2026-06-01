@@ -97,7 +97,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                                 app.game
                                     .player_hand()
                                     .get_card(index)
-                                    .map(|card| format!("Copy from: {}", card.get_name()))
+                                    .map(|card| format!("Copy from: {}", card.name()))
                             })
                         {
                             text.push('\n');
@@ -138,7 +138,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                     app.game
                         .player_hand()
                         .get_card(hand_index)
-                        .map(|card| format!("> {}", card.get_name()))
+                        .map(|card| format!("> {}", card.name()))
                         .unwrap_or_else(|| "Copy rank to Joker".to_string())
                 } else {
                     "Copy rank to Joker".to_string()

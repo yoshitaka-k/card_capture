@@ -24,7 +24,7 @@ pub fn help_content(app: &mut App, frame: &mut Frame, area: Rect) {
             app.game
                 .player_hand()
                 .get_card(index)
-                .map(|card| format!("Joker from card: {}", card.get_name()))
+                .map(|card| format!("Joker from card: {}", card.name()))
         });
 
     let text = if let Some(ref msg) = joker_help {

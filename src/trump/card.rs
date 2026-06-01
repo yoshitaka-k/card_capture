@@ -30,7 +30,6 @@ use crate::trump::constants::{
     JOKER_STR_RANK,
     JOKER_TO_RANK,
 };
-use std::fmt::Write as _;
 
 /// カードの情報
 #[derive(Debug, Clone)]
@@ -44,11 +43,11 @@ impl Card {
         Self { suit: suit.to_string(), rank }
     }
 
-    pub fn get_suit(&self) -> &String {
+    pub fn suit(&self) -> &String {
         &self.suit
     }
 
-    pub fn get_rank(&self) -> usize {
+    pub fn rank(&self) -> usize {
         if self.is_joker() {
             return 0;
         }
@@ -87,7 +86,7 @@ impl Card {
         (suit, rank)
     }
 
-    pub fn get_calc_rank(&self) -> usize {
+    pub fn calc_rank(&self) -> usize {
         match self.suit.as_str() {
             SUIT_STR_JOKER => {
                 JOKER_TO_RANK
@@ -104,7 +103,7 @@ impl Card {
         }
     }
 
-    pub fn get_disp_suit(&self) -> String {
+    pub fn disp_suit(&self) -> String {
         match self.suit.as_str() {
             SUIT_STR_HART => SUIT_ICON_HART,
             SUIT_STR_DIAMOND => SUIT_ICON_DIAMOND,
@@ -115,7 +114,7 @@ impl Card {
         }.to_string()
     }
 
-    pub fn get_disp_rank(&self) -> String {
+    pub fn disp_rank(&self) -> String {
         match self.suit.as_str() {
             SUIT_STR_JOKER => {
                 JOKER_STR_RANK.to_string()
@@ -132,34 +131,10 @@ impl Card {
         }
     }
 
-    pub fn get_name(&self) -> String {
-        let suit = match self.suit.as_str() {
-            SUIT_STR_HART => SUIT_ICON_HART,
-            SUIT_STR_DIAMOND => SUIT_ICON_DIAMOND,
-            SUIT_STR_CLOVER => SUIT_ICON_CLOVER,
-            SUIT_STR_SPADE => SUIT_ICON_SPADE,
-            SUIT_STR_JOKER => SUIT_ICON_JOKER,
-            _ => "?",
-        };
-
+    pub fn name(&self) -> String {
         let mut name = String::with_capacity(4);
-        name.push_str(suit);
-        match self.suit.as_str() {
-            SUIT_STR_JOKER => {
-                name.push_str(JOKER_STR_RANK);
-            }
-            _ => {
-                match self.rank {
-                    ACE_FROM_RANK => name.push_str(ACE_STR_RANK),
-                    JACK_FROM_RANK => name.push_str(JACK_STR_RANK),
-                    QUEEN_FROM_RANK => name.push_str(QUEEN_STR_RANK),
-                    KING_FROM_RANK => name.push_str(KING_STR_RANK),
-                    _ => {
-                        let _ = write!(&mut name, "{}", self.rank);
-                    }
-                }
-            }
-        }
+        name.push_str(&self.disp_suit());
+        name.push_str(&self.disp_rank());
         name
     }
 }
@@ -167,6 +142,6 @@ impl Card {
 impl std::fmt::Display for Card {
     /// スート・ランク表示
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.get_name())
+        write!(f, "{}", self.name())
     }
 }

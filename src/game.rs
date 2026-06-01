@@ -121,7 +121,7 @@ impl Game {
     pub fn initial_end_phase_enemy_deck(&mut self) {
         for i in 0..MAX_HAND_SIZE {
             if let Some(card) = self.enemy_hand.get_card(i) {
-                match card.get_rank() {
+                match card.rank() {
                     JACK_FROM_RANK => self.put_enemy_card_to_deck(i),
                     QUEEN_FROM_RANK => self.put_enemy_card_to_deck(i),
                     KING_FROM_RANK => self.put_enemy_card_to_deck(i),
@@ -212,7 +212,7 @@ impl Game {
         for (index, selected) in self.player_select.iter().enumerate() {
             if *selected {
                 if let Some(card) = self.player_hand.get_card(index) {
-                    rank += card.get_calc_rank();
+                    rank += card.calc_rank();
                 }
             }
         }
@@ -220,7 +220,7 @@ impl Game {
         for (index, selected) in self.player_hand_copy_joker[0].iter().enumerate() {
             if *selected {
                 if let Some(card) = self.player_hand.get_card(index) {
-                    rank += card.get_calc_rank();
+                    rank += card.calc_rank();
                 }
             }
         }
@@ -233,7 +233,7 @@ impl Game {
         for (index, selected) in self.enemy_select.iter().enumerate() {
             if *selected {
                 if let Some(card) = self.enemy_hand.get_card(index) {
-                    rank += card.get_calc_rank();
+                    rank += card.calc_rank();
                 }
             }
         }

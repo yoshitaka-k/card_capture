@@ -20,7 +20,7 @@ pub(crate) fn player_select_event(app: &mut App, mouse_pos: Position) {
                     app.game.clear_player_hand_copy_joker(0);
                 }
             } else if let Some(card) = app.game.player_hand().get_card(hand_index) {
-                let suit = card.get_suit().clone();
+                let suit = card.suit().clone();
                 app.game.add_player_select(hand_index, true);
                 app.game.set_suit(&suit);
             }
