@@ -85,6 +85,8 @@ impl Game {
         self.gameover = false;
     }
 
+    // --- デッキ ---
+
     /// プレイヤーのデッキにカードを設定
     pub fn set_player_deck_cards(&mut self, cards: Vec<Card>) {
         self.player_deck.set_cards(cards);
@@ -108,6 +110,16 @@ impl Game {
     /// プレイヤーのデッキにカードを追加
     pub fn add_player_deck(&mut self, card: Card) {
         self.player_deck.push(card);
+    }
+
+    /// 敵のデッキからカードを引く
+    pub fn draw_enemy_card(&mut self) -> Option<Card> {
+        self.enemy_deck.draw()
+    }
+
+    /// プレイヤーのデッキからカードを引く
+    pub fn draw_player_card(&mut self) -> Option<Card> {
+        self.player_deck.draw()
     }
 
     /// 敵の手札からカードをデッキに戻す
@@ -134,6 +146,8 @@ impl Game {
         }
     }
 
+    // --- 手札 ---
+
     /// 敵の手札にカードを追加
     pub fn add_enemy_hand(&mut self, card: Card) {
         self.enemy_hand.add(card);
@@ -159,6 +173,11 @@ impl Game {
         self.enemy_hand.remove(index);
     }
 
+    /// プレイヤーの手札からカードを削除
+    pub fn remove_player_hand_card(&mut self, index: usize) {
+        self.player_hand.remove(index);
+    }
+
     /// 敵の手札から `None` の空きスロットを除去する
     pub fn compact_enemy_hand(&mut self) {
         self.enemy_hand.compact();
@@ -169,10 +188,42 @@ impl Game {
         self.player_hand.compact();
     }
 
-    /// プレイヤーの手札からカードを削除
-    pub fn remove_player_hand_card(&mut self, index: usize) {
-        self.player_hand.remove(index);
+    // --- ジョーカーコピー ---
+
+    /// 手札のジョーカーに他カードのランクの有無を設定
+    pub fn set_player_hand_copy_joker(&mut self, joker_index: usize, index: usize, selected: bool) {
+        self.player_hand_copy_joker[joker_index][index] = selected;
     }
+
+    /// 手札のジョーカーに他カードのランクの有無を取得
+    pub fn is_player_hand_copy_joker(&self, joker_index: usize, index: usize) -> bool {
+        self.player_hand_copy_joker
+            .get(joker_index)
+            .and_then(|slots| slots.get(index))
+            .copied()
+            .unwrap_or(false)
+    }
+
+    /// ジョーカーへコピー元として選ばれている手札インデックス
+    pub fn player_hand_copy_joker_source(&self, joker_index: usize) -> Option<usize> {
+        self.player_hand_copy_joker[joker_index]
+            .iter()
+            .position(|&selected| selected)
+    }
+
+    /// ジョーカーコピー用スロットから未選択のものを除去する
+    pub fn compact_player_hand_copy_joker(&mut self, index: usize) {
+        self.player_hand_copy_joker[index].retain(|joker| *joker);
+    }
+
+    /// プレイヤーの手札にジョーカーのランクをクリア
+    pub fn clear_player_hand_copy_joker(&mut self, index: usize) {
+        for joker in self.player_hand_copy_joker[index].iter_mut() {
+            *joker = false;
+        }
+    }
+
+    // --- 選択 ---
 
     /// 敵の選択したカードを追加
     pub fn add_enemy_select(&mut self, index: usize, selected: bool) {
@@ -205,6 +256,19 @@ impl Game {
         }
     }
 
+    /// 敵の選択したカードの合計ランクを計算
+    pub fn calc_enemy_select_rank(&self) -> usize {
+        let mut rank = 0;
+        for (index, selected) in self.enemy_select.iter().enumerate() {
+            if *selected {
+                if let Some(card) = self.enemy_hand.card(index) {
+                    rank += card.calc_rank();
+                }
+            }
+        }
+        rank
+    }
+
     /// プレイヤーの選択したカードの合計ランクを計算
     pub fn calc_player_select_rank(&self) -> usize {
         let mut rank = 0;
@@ -227,17 +291,18 @@ impl Game {
         rank
     }
 
-    /// 敵の選択したカードの合計ランクを計算
-    pub fn calc_enemy_select_rank(&self) -> usize {
-        let mut rank = 0;
-        for (index, selected) in self.enemy_select.iter().enumerate() {
+    /// プレイヤーの選択したカードにジョーカーがあるかどうかを取得
+    pub fn is_player_select_joker(&self) -> bool {
+        for (index, selected) in self.player_select.iter().enumerate() {
             if *selected {
-                if let Some(card) = self.enemy_hand.card(index) {
-                    rank += card.calc_rank();
+                if let Some(card) = self.player_hand.card(index) {
+                    if card.is_joker() {
+                        return true;
+                    }
                 }
             }
         }
-        rank
+        false
     }
 
     /// 敵の選択状態をクリア
@@ -249,6 +314,8 @@ impl Game {
     pub fn clear_player_select(&mut self) {
         self.player_select = vec![false; MAX_HAND_SIZE];
     }
+
+    // --- フラグ ---
 
     /// 敵の捕獲状態を取得
     pub fn is_enemy_cupture(&self) -> bool {
@@ -275,6 +342,8 @@ impl Game {
         self.gameover
     }
 
+    // --- 捨て札 ---
+
     /// 敵の捨て札にカードを追加
     pub fn add_enemy_discard(&mut self, card: Card) {
         self.enemy_discard.push(card);
@@ -285,25 +354,17 @@ impl Game {
         self.player_discard.push(card);
     }
 
-    /// プレイヤーの捨て札をクリア
-    pub fn clear_player_discard(&mut self) {
-        self.player_discard.clear();
-    }
-
     /// 敵の捨て札をクリア
     pub fn clear_enemy_discard(&mut self) {
         self.enemy_discard.clear();
     }
 
-    /// 敵のデッキからカードを引く
-    pub fn draw_enemy_card(&mut self) -> Option<Card> {
-        self.enemy_deck.draw()
+    /// プレイヤーの捨て札をクリア
+    pub fn clear_player_discard(&mut self) {
+        self.player_discard.clear();
     }
 
-    /// プレイヤーのデッキからカードを引く
-    pub fn draw_player_card(&mut self) -> Option<Card> {
-        self.player_deck.draw()
-    }
+    // --- スート ---
 
     /// スートを設定
     pub fn set_suit(&mut self, suit: &str) {
@@ -316,54 +377,6 @@ impl Game {
     pub fn clear_suit(&mut self) {
         self.suit = String::new();
     }
-
-    /// 手札のジョーカーに他カードのランクの有無を設定
-    pub fn set_player_hand_copy_joker(&mut self, joker_index: usize, index: usize, selected: bool) {
-        self.player_hand_copy_joker[joker_index][index] = selected;
-    }
-
-    /// 手札のジョーカーに他カードのランクの有無を取得
-    pub fn is_player_hand_copy_joker(&self, joker_index: usize, index: usize) -> bool {
-        self.player_hand_copy_joker
-            .get(joker_index)
-            .and_then(|slots| slots.get(index))
-            .copied()
-            .unwrap_or(false)
-    }
-
-    /// ジョーカーへコピー元として選ばれている手札インデックス
-    pub fn player_hand_copy_joker_source(&self, joker_index: usize) -> Option<usize> {
-        self.player_hand_copy_joker[joker_index]
-            .iter()
-            .position(|&selected| selected)
-    }
-
-    /// プレイヤーの選択したカードにジョーカーがあるかどうかを取得
-    pub fn is_player_select_joker(&self) -> bool {
-        for (index, selected) in self.player_select.iter().enumerate() {
-            if *selected {
-                if let Some(card) = self.player_hand.card(index) {
-                    if card.is_joker() {
-                        return true;
-                    }
-                }
-            }
-        }
-        false
-    }
-
-    /// プレイヤーの手札から `None` の空きスロットを除去する
-    pub fn compact_player_hand_copy_joker(&mut self, index: usize) {
-        self.player_hand_copy_joker[index].retain(|joker| *joker);
-    }
-
-    /// プレイヤーの手札にジョーカーのランクをクリア
-    pub fn clear_player_hand_copy_joker(&mut self, index: usize) {
-        for joker in self.player_hand_copy_joker[index].iter_mut() {
-            *joker = false;
-        }
-    }
-
 }
 
 /// デッキをシャッフル
