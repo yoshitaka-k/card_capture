@@ -9,7 +9,11 @@ use ratatui::crossterm::event::{
 };
 use crate::constants::{MAX_HAND_SIZE, PHASE_ADVANCE_DELAY_TICKS};
 use crate::app::{App, CurrentScreen, GamePhase};
+use crate::handle::draw::handle_draw;
+use crate::handle::end::handle_end;
+use crate::handle::enemy_draw::handle_enemy_draw;
 use crate::handle::flags::update_flags;
+use crate::handle::gameover_mouse_left::handle_gameover_mouse_left;
 use crate::handle::select::player_select_event;
 use crate::handle::shared::{clear_select, clear_suit_if_no_selection, visual_to_hand_index};
 
@@ -106,34 +110,6 @@ fn handle_main_mouse_left(app: &mut App, mouse_event: MouseEvent) {
     }
 }
 
-/// ゲームオーバー画面のマウス左クリックイベントを処理する
-fn handle_gameover_mouse_left(app: &mut App) {
-    match app.current_phase {
-        GamePhase::End => {
-            app.start();
-
-            app.current_phase = GamePhase::Setup;
-            app.current_screen = CurrentScreen::Main;
-        }
-        _ => {}
-    }
-}
-
-/// 敵のデッキからカードを引くイベントを処理する
-fn handle_enemy_draw(app: &mut App, mouse_pos: Position) {
-    // 敵のデッキからカードを引く
-    if app.positions.enemy_deck().contains(mouse_pos) {
-        if app.game.get_enemy_hand().len() < MAX_HAND_SIZE {
-            if let Some(card) = app.game.draw_enemy_card() {
-                app.game.add_enemy_hand(card);
-            }
-        }
-    }
-
-    clear_select(app);
-    update_flags(app);
-}
-
 /// 捨て札フェーズのイベントを処理する
 fn handle_discard(app: &mut App, mouse_pos: Position) {
     // プレイヤーの手札からカードを選択する
@@ -227,44 +203,6 @@ fn handle_capture(app: &mut App, mouse_pos: Position) {
             discard_event(app);
             app.advance_phase();
         }
-    }
-}
-
-/// プレイヤーのデッキからカードを引くイベントを処理する
-fn handle_draw(app: &mut App, mouse_pos: Position) {
-    // プレイヤーのデッキからカードを引く
-    if app.positions.player_deck().contains(mouse_pos) {
-        if app.game.get_player_hand().len() < MAX_HAND_SIZE {
-            if let Some(card) = app.game.draw_player_card() {
-                app.game.add_player_hand(card);
-            } else {
-                let cards = app.game.get_player_discard().clone();
-                app.game.set_player_deck_cards(cards);
-                app.game.shuffle_player_deck();
-
-                app.game.clear_player_discard();
-
-                if let Some(card) = app.game.draw_player_card() {
-                    app.game.add_player_hand(card);
-                }
-            }
-        }
-    }
-
-    clear_select(app);
-    update_flags(app);
-}
-
-/// エンドフェーズの処理を行う
-fn handle_end(app: &mut App) {
-    clear_select(app);
-    update_flags(app);
-
-    // 捨て札にA、K、Q、Jがある場合はゲームオーバー
-    if app.game.is_gameover() {
-        app.current_screen = CurrentScreen::GameOver;
-    } else {
-        app.advance_phase();
     }
 }
 
