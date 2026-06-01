@@ -120,7 +120,7 @@ impl Game {
     /// ゲーム開始のセットアップフェース終了時の敵のデッキを初期化
     pub fn initial_end_phase_enemy_deck(&mut self) {
         for i in 0..MAX_HAND_SIZE {
-            if let Some(card) = self.enemy_hand.get_card(i) {
+            if let Some(card) = self.enemy_hand.card(i) {
                 match card.rank() {
                     JACK_FROM_RANK => self.put_enemy_card_to_deck(i),
                     QUEEN_FROM_RANK => self.put_enemy_card_to_deck(i),
@@ -211,7 +211,7 @@ impl Game {
         // プレイヤーの選択したカードの合計ランクを計算
         for (index, selected) in self.player_select.iter().enumerate() {
             if *selected {
-                if let Some(card) = self.player_hand.get_card(index) {
+                if let Some(card) = self.player_hand.card(index) {
                     rank += card.calc_rank();
                 }
             }
@@ -219,7 +219,7 @@ impl Game {
         // コピーしたジョーカーのランクを加算
         for (index, selected) in self.player_hand_copy_joker[0].iter().enumerate() {
             if *selected {
-                if let Some(card) = self.player_hand.get_card(index) {
+                if let Some(card) = self.player_hand.card(index) {
                     rank += card.calc_rank();
                 }
             }
@@ -232,7 +232,7 @@ impl Game {
         let mut rank = 0;
         for (index, selected) in self.enemy_select.iter().enumerate() {
             if *selected {
-                if let Some(card) = self.enemy_hand.get_card(index) {
+                if let Some(card) = self.enemy_hand.card(index) {
                     rank += card.calc_rank();
                 }
             }
@@ -342,7 +342,7 @@ impl Game {
     pub fn is_player_select_joker(&self) -> bool {
         for (index, selected) in self.player_select.iter().enumerate() {
             if *selected {
-                if let Some(card) = self.player_hand.get_card(index) {
+                if let Some(card) = self.player_hand.card(index) {
                     if card.is_joker() {
                         return true;
                     }

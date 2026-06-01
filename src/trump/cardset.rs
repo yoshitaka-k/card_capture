@@ -39,7 +39,7 @@ impl CardSet {
     }
 
     /// 敵の手札からカードを取得
-    pub fn get_card(&self, index: usize) -> Option<&Card> {
+    pub fn card(&self, index: usize) -> Option<&Card> {
         let cardset = &self.0;
         if index < cardset.len() {
             if let Some(card) = &cardset[index] {
@@ -69,7 +69,7 @@ impl CardSet {
 
     /// 手札にジョーカーがあるかどうかを取得
     pub fn is_joker(&self, index: usize) -> bool {
-        if let Some(card) = self.get_card(index) {
+        if let Some(card) = self.card(index) {
             card.is_joker()
         } else {
             false
