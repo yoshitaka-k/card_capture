@@ -12,7 +12,7 @@ use std::ops::{Bound, RangeBounds};
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// 現在の時刻をシード値にして乱数生成器を初期化
-pub fn get_seed() -> u64 {
+pub fn seed() -> u64 {
     let now = SystemTime::now();
     let duration = now.duration_since(UNIX_EPOCH).expect("Time went backwards");
     duration.as_micros() as u64
@@ -24,7 +24,7 @@ struct SimpleRand {
 }
 impl SimpleRand {
     pub fn new() -> Self {
-        SimpleRand { seed: get_seed() }
+        SimpleRand { seed: seed() }
     }
 
     // 次の乱数を生成する（LCGの超有名な定数だよっ）
@@ -54,7 +54,7 @@ impl SimpleRand {
 }
 
 /// 真ん中あたりの位置を取得（少しだけランダム）
-pub fn get_center_position(cards_len: usize) -> usize {
+pub fn center_position(cards_len: usize) -> usize {
     if cards_len == 0 {
         return 0;
     }

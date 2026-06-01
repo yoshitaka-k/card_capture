@@ -1,7 +1,7 @@
 use std::thread;
 use std::time::Duration;
 
-use crate::trump::shuffle::get_center_position;
+use crate::trump::shuffle::center_position;
 use crate::trump::{Card};
 use crate::trump::shuffle::SimpleRand;
 
@@ -47,7 +47,7 @@ fn riffle_shuffle_once(cards: &mut Vec<Card>, max_chunk: usize) {
     let mut rng = SimpleRand::new();
 
     // だいたい真ん中付近で山を2つに切る（少しだけランダム）。
-    let cut = get_center_position(cards.len());
+    let cut = center_position(cards.len());
 
     let mut right = cards.split_off(cut);
     let mut left = std::mem::take(cards);
