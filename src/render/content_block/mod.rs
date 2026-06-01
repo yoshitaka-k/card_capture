@@ -92,7 +92,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                     if card.is_joker() {
                         if let Some(copy_label) = app
                             .game
-                            .get_player_hand_copy_joker_source(0)
+                            .player_hand_copy_joker_source(0)
                             .and_then(|index| {
                                 app.game
                                     .player_hand()

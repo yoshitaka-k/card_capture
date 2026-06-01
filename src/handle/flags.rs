@@ -25,7 +25,7 @@ fn update_player_capture(app: &mut App) -> bool {
 
     // ジョーカーが選択されている場合、コピー元が選択されていなければ捕獲失敗
     if app.game.is_player_select_joker()
-        && app.game.get_player_hand_copy_joker_source(0).is_none()
+        && app.game.player_hand_copy_joker_source(0).is_none()
     {
         app.game.set_player_cupture(false);
         return false;

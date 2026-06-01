@@ -332,7 +332,7 @@ impl Game {
     }
 
     /// ジョーカーへコピー元として選ばれている手札インデックス
-    pub fn get_player_hand_copy_joker_source(&self, joker_index: usize) -> Option<usize> {
+    pub fn player_hand_copy_joker_source(&self, joker_index: usize) -> Option<usize> {
         self.player_hand_copy_joker[joker_index]
             .iter()
             .position(|&selected| selected)

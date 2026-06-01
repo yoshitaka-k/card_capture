@@ -19,7 +19,7 @@ pub fn help_content(app: &mut App, frame: &mut Frame, area: Rect) {
 
     let joker_help = app
         .game
-        .get_player_hand_copy_joker_source(0)
+        .player_hand_copy_joker_source(0)
         .and_then(|index| {
             app.game
                 .player_hand()
