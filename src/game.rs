@@ -159,13 +159,13 @@ impl Game {
     }
 
     /// 敵の手札からカードを取り出す
-    pub fn take_enemy_hand_card(&mut self, index: usize) {
-        self.enemy_hand.take(index);
+    pub fn take_enemy_hand_card(&mut self, index: usize) -> Option<Card> {
+        self.enemy_hand.take(index)
     }
 
     /// プレイヤーの手札からカードを取り出す
-    pub fn take_player_hand_card(&mut self, index: usize) {
-        self.player_hand.take(index);
+    pub fn take_player_hand_card(&mut self, index: usize) -> Option<Card> {
+        self.player_hand.take(index)
     }
 
     /// 敵の手札からカードを削除
