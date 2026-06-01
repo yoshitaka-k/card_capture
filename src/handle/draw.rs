@@ -12,11 +12,9 @@ pub(crate) fn handle_draw(app: &mut App, mouse_pos: Position) {
             if let Some(card) = app.game.draw_player_card() {
                 app.game.add_player_hand(card);
             } else {
-                let cards = app.game.player_discard().clone();
+                let cards = app.game.take_player_discard();
                 app.game.set_player_deck_cards(cards);
                 app.game.shuffle_player_deck();
-
-                app.game.clear_player_discard();
 
                 if let Some(card) = app.game.draw_player_card() {
                     app.game.add_player_hand(card);

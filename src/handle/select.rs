@@ -19,10 +19,8 @@ pub(crate) fn player_select_event(app: &mut App, mouse_pos: Position) {
                 if app.game.player_hand().is_joker(hand_index) {
                     app.game.clear_player_hand_copy_joker(0);
                 }
-            } else if let Some(card) = app.game.player_hand().card(hand_index) {
-                let suit = card.suit().clone();
-                app.game.add_player_select(hand_index, true);
-                app.game.set_suit(&suit);
+            } else {
+                app.game.select_player_hand(hand_index);
             }
 
             break;

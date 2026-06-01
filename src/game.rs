@@ -238,6 +238,32 @@ impl Game {
         self.player_select[index] = selected;
     }
 
+    /// プレイヤーの手札を選択し、未設定ならそのカードのスートを記録する
+    pub fn select_player_hand(&mut self, index: usize) -> bool {
+        if self.player_hand.card(index).is_none() {
+            return false;
+        }
+        self.player_select[index] = true;
+        self.set_suit_from_player_hand(index);
+        true
+    }
+
+    /// 敵の手札を選択する。プレイヤーが未選択ならスートを再設定する
+    pub fn select_enemy_hand(&mut self, index: usize) -> bool {
+        if self.enemy_hand.card(index).is_none() {
+            return false;
+        }
+        for i in 0..self.enemy_select.len() {
+            self.enemy_select[i] = false;
+        }
+        self.enemy_select[index] = true;
+        if self.player_select.iter().all(|&selected| !selected) {
+            self.clear_suit();
+            self.set_suit_from_enemy_hand(index);
+        }
+        true
+    }
+
     /// 敵の選択状態を取得
     pub fn is_enemy_selected(&self, index: usize) -> bool {
         if index < self.enemy_select.len() {
@@ -364,18 +390,38 @@ impl Game {
         self.player_discard.clear();
     }
 
-    // --- スート ---
-
-    /// スートを設定
-    pub fn set_suit(&mut self, suit: &str) {
-        if self.suit.is_empty() && suit != SUIT_STR_JOKER {
-            self.suit = suit.to_string();
-        }
+    /// プレイヤーの捨て札を取り出す（山札切れ時の再構築用）
+    pub fn take_player_discard(&mut self) -> Vec<Card> {
+        std::mem::take(&mut self.player_discard)
     }
+
+    // --- スート ---
 
     /// スートをクリア
     pub fn clear_suit(&mut self) {
         self.suit = String::new();
+    }
+
+    fn set_suit_from_player_hand(&mut self, index: usize) {
+        if !self.suit.is_empty() {
+            return;
+        }
+        if let Some(card) = self.player_hand.card(index) {
+            if card.suit() != SUIT_STR_JOKER {
+                self.suit.clone_from(card.suit());
+            }
+        }
+    }
+
+    fn set_suit_from_enemy_hand(&mut self, index: usize) {
+        if !self.suit.is_empty() {
+            return;
+        }
+        if let Some(card) = self.enemy_hand.card(index) {
+            if card.suit() != SUIT_STR_JOKER {
+                self.suit.clone_from(card.suit());
+            }
+        }
     }
 }
 

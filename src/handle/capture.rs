@@ -18,14 +18,8 @@ pub(crate) fn handle_capture(app: &mut App, mouse_pos: Position) {
             if app.game.is_enemy_selected(hand_index) {
                 app.game.add_enemy_select(hand_index, false);
                 clear_suit_if_no_selection(&mut app.game);
-            } else if let Some(card) = app.game.enemy_hand().card(hand_index) {
-                let suit = card.suit().clone();
-                app.game.add_enemy_select(hand_index, true);
-
-                if app.game.player_select().iter().all(|&s| !s) {
-                    app.game.clear_suit();
-                    app.game.set_suit(&suit);
-                }
+            } else {
+                app.game.select_enemy_hand(hand_index);
             }
 
             update_flags(app);
