@@ -1,3 +1,4 @@
+use getset::{MutGetters, Setters};
 use crate::trump::{Card};
 
 pub enum DeckType {
@@ -6,8 +7,9 @@ pub enum DeckType {
 }
 
 /// トランプカードの山札
-#[derive(Default)]
+#[derive(Default, MutGetters, Setters)]
 pub struct Deck {
+    #[getset(get_mut = "pub", set = "pub")]
     cards: Vec<Card>,
 }
 
@@ -35,14 +37,6 @@ impl Deck {
         }
 
         Self { cards: cards }
-    }
-
-    pub fn set_cards(&mut self, cards: Vec<Card>) {
-        self.cards = cards;
-    }
-
-    pub fn get_cards(&mut self) -> &mut Vec<Card> {
-        &mut self.cards
     }
 
     pub fn len(&self) -> usize {

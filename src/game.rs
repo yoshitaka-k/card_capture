@@ -78,14 +78,12 @@ impl Game {
 
     /// 敵のデッキをシャッフル
     pub fn shuffle_enemy_deck(&mut self) {
-        let cards = self.enemy_deck.get_cards();
-        shuffle_deck(cards);
+        shuffle_deck(self.enemy_deck.cards_mut());
     }
 
     /// プレイヤーのデッキをシャッフル
     pub fn shuffle_player_deck(&mut self) {
-        let cards = self.player_deck.get_cards();
-        shuffle_deck(cards);
+        shuffle_deck(self.player_deck.cards_mut());
     }
 
     /// 敵のデッキを取得
