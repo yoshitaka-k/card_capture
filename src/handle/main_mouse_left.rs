@@ -16,13 +16,13 @@ pub(crate) fn handle_main_mouse_left(app: &mut App, mouse_event: MouseEvent) {
     match app.current_phase {
         GamePhase::Setup => {
             handle_enemy_draw(app, mouse_pos);
-            if app.game.get_enemy_hand().len() == MAX_HAND_SIZE {
+            if app.game.enemy_hand().len() == MAX_HAND_SIZE {
                 app.schedule_phase_advance(PHASE_ADVANCE_DELAY_TICKS);
             }
         }
         GamePhase::Enemy => {
             handle_enemy_draw(app, mouse_pos);
-            if app.game.get_enemy_hand().len() == MAX_HAND_SIZE {
+            if app.game.enemy_hand().len() == MAX_HAND_SIZE {
                 app.schedule_phase_advance(PHASE_ADVANCE_DELAY_TICKS);
             }
         }
@@ -31,7 +31,7 @@ pub(crate) fn handle_main_mouse_left(app: &mut App, mouse_event: MouseEvent) {
         }
         GamePhase::Draw => {
             handle_draw(app, mouse_pos);
-            if app.game.get_player_hand().len() == MAX_HAND_SIZE {
+            if app.game.player_hand().len() == MAX_HAND_SIZE {
                 app.schedule_phase_advance(PHASE_ADVANCE_DELAY_TICKS);
             }
         }

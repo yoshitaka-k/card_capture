@@ -28,7 +28,7 @@ pub fn enemy_content(app: &mut App, frame: &mut Frame, area: Rect) {
         .padding(Padding::horizontal(1));
 
     let deck_content = Paragraph::new(
-            format!("Enemy Deck count: {}", app.game.get_enemy_deck().len())
+            format!("Enemy Deck count: {}", app.game.enemy_deck().len())
         ).block(deck_block);
 
     app.positions.set_enemy_deck(enemy_chunks[0]);

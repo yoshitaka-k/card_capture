@@ -22,7 +22,7 @@ pub fn help_content(app: &mut App, frame: &mut Frame, area: Rect) {
         .get_player_hand_copy_joker_source(0)
         .and_then(|index| {
             app.game
-                .get_player_hand()
+                .player_hand()
                 .get_card(index)
                 .map(|card| format!("Joker from card: {}", card.get_name()))
         });

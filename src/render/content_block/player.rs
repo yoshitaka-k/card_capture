@@ -27,7 +27,7 @@ pub fn player_content(app: &mut App, frame: &mut Frame, area: Rect) {
         .padding(Padding::horizontal(1));
 
     let deck_content = Paragraph::new(
-            format!("Player Deck count: {}", app.game.get_player_deck().len())
+            format!("Player Deck count: {}", app.game.player_deck().len())
         ).block(deck_block);
 
     app.positions.set_player_deck(player_chunks[0]);

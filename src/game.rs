@@ -1,3 +1,4 @@
+use getset::{Getters, Setters};
 use crate::constants::{MAX_HAND_SIZE};
 use crate::trump::constants::{
     JACK_FROM_RANK,
@@ -26,22 +27,44 @@ use crate::trump::shuffle::{
     DealParams,
 };
 
-#[derive(Default)]
+#[derive(Default, Getters, Setters)]
 pub struct Game {
+    #[getset(get = "pub")]
     enemy_deck: Deck,
+    #[getset(get = "pub")]
     player_deck: Deck,
+
+    #[getset(get = "pub")]
     enemy_hand: CardSet,
+    #[getset(get = "pub")]
     player_hand: CardSet,
+
     player_hand_copy_joker: [Vec<bool>; 2],
+
+    #[getset(get = "pub")]
     enemy_discard: Vec<Card>,
+    #[getset(get = "pub")]
     player_discard: Vec<Card>,
+
+    #[getset(get = "pub")]
     enemy_select: Vec<bool>,
+    #[getset(get = "pub")]
     player_select: Vec<bool>,
+
+    #[getset(set = "pub")]
     enemy_cupture: bool,
+    #[getset(set = "pub")]
     player_cupture: bool,
+
+    #[getset(set = "pub")]
     discard: bool,
+    #[getset(set = "pub")]
     sacrifice: bool,
+
+    #[getset(set = "pub")]
     gameover: bool,
+
+    #[getset(get = "pub")]
     suit: String,
 }
 
@@ -84,16 +107,6 @@ impl Game {
     /// プレイヤーのデッキをシャッフル
     pub fn shuffle_player_deck(&mut self) {
         shuffle_deck(self.player_deck.cards_mut());
-    }
-
-    /// 敵のデッキを取得
-    pub fn get_enemy_deck(&self) -> &Deck {
-        &self.enemy_deck
-    }
-
-    /// プレイヤーのデッキを取得
-    pub fn get_player_deck(&self) -> &Deck {
-        &self.player_deck
     }
 
     /// 敵のデッキにカードを追加
@@ -141,11 +154,6 @@ impl Game {
     }
 
     /// 敵の手札を取得
-    pub fn get_enemy_hand(&self) -> &CardSet {
-        &self.enemy_hand
-    }
-
-    /// 敵の手札を取得
     pub fn get_enemy_hand_card(&self, index: usize) -> Option<&Card> {
         if index < self.enemy_hand.len() {
             self.enemy_hand.get_card(index)
@@ -185,11 +193,6 @@ impl Game {
     }
 
     /// プレイヤーの手札を取得
-    pub fn get_player_hand(&self) -> &CardSet {
-        &self.player_hand
-    }
-
-    /// プレイヤーの手札を取得
     pub fn get_player_hand_card(&self, index: usize) -> Option<&Card> {
         if index < self.player_hand.len() {
             self.player_hand.get_card(index)
@@ -209,16 +212,6 @@ impl Game {
     /// プレイヤーの選択したカードを追加
     pub fn add_player_select(&mut self, index: usize, selected: bool) {
         self.player_select[index] = selected;
-    }
-
-    /// 敵の選択したカードを取得
-    pub fn get_enemy_select(&self) -> &Vec<bool> {
-        &self.enemy_select
-    }
-
-    /// プレイヤーの選択したカードを取得
-    pub fn get_player_select(&self) -> &Vec<bool> {
-        &self.player_select
     }
 
     /// 敵の選択状態を取得
@@ -284,16 +277,6 @@ impl Game {
         self.player_select = vec![false; MAX_HAND_SIZE];
     }
 
-    /// 敵の捕獲状態を設定
-    pub fn set_enemy_cupture(&mut self, cupture: bool) {
-        self.enemy_cupture = cupture;
-    }
-
-    /// プレイヤーの捕獲状態を設定
-    pub fn set_player_cupture(&mut self, cupture: bool) {
-        self.player_cupture = cupture;
-    }
-
     /// 敵の捕獲状態を取得
     pub fn is_enemy_cupture(&self) -> bool {
         self.enemy_cupture
@@ -304,24 +287,19 @@ impl Game {
         self.player_cupture
     }
 
-    /// 捨て札フラグを設定
-    pub fn set_discard(&mut self, discard: bool) {
-        self.discard = discard;
-    }
-
     /// 捨て札フラグを取得
     pub fn is_discard(&self) -> bool {
         self.discard
     }
 
-    /// 生贄フラグを設定
-    pub fn set_sacrifice(&mut self, sacrifice: bool) {
-        self.sacrifice = sacrifice;
-    }
-
     /// 生贄フラグを取得
     pub fn is_sacrifice(&self) -> bool {
         self.sacrifice
+    }
+
+    /// ゲームオーバーフラグを取得
+    pub fn is_gameover(&self) -> bool {
+        self.gameover
     }
 
     /// 敵の捨て札にカードを追加
@@ -332,16 +310,6 @@ impl Game {
     /// プレイヤーの捨て札にカードを追加
     pub fn add_player_discard(&mut self, card: Card) {
         self.player_discard.push(card);
-    }
-
-    /// 敵の捨て札を取得
-    pub fn get_enemy_discard(&self) -> &Vec<Card> {
-        &self.enemy_discard
-    }
-
-    /// プレイヤーの捨て札を取得
-    pub fn get_player_discard(&self) -> &Vec<Card> {
-        &self.player_discard
     }
 
     /// プレイヤーの捨て札をクリア
@@ -369,11 +337,6 @@ impl Game {
         if self.suit.is_empty() && suit != SUIT_STR_JOKER {
             self.suit = suit.to_string();
         }
-    }
-
-    /// スートを取得
-    pub fn get_suit(&self) -> &String {
-        &self.suit
     }
 
     /// スートをクリア
@@ -440,15 +403,6 @@ impl Game {
         }
     }
 
-    /// ゲームオーバーフラグを設定
-    pub fn set_gameover(&mut self, gameover: bool) {
-        self.gameover = gameover;
-    }
-
-    /// ゲームオーバーフラグを取得
-    pub fn is_gameover(&self) -> bool {
-        self.gameover
-    }
 }
 
 /// デッキをシャッフル

@@ -54,7 +54,7 @@ fn discard_content(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Deck
         DeckType::Player => {
             format!(
                 "Player Discard count: {}\nCupture: {}\nDiscard: {}",
-                app.game.get_player_discard().len(),
+                app.game.player_discard().len(),
                 app.game.is_player_cupture(),
                 app.game.is_discard(),
             )
@@ -62,7 +62,7 @@ fn discard_content(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Deck
         DeckType::Enemy => {
             format!(
                 "Enemy Discard count: {}\nDiscard: {}\nSacrifice: {}",
-                app.game.get_enemy_discard().len(),
+                app.game.enemy_discard().len(),
                 app.game.is_enemy_cupture(),
                 app.game.is_sacrifice(),
             )

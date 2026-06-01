@@ -10,8 +10,8 @@ pub(crate) fn visual_to_hand_index(visual_index: usize) -> usize {
 
 /// 敵またはプレイヤーの手札に選択があるか
 fn has_any_selection(game: &Game) -> bool {
-    game.get_enemy_select().iter().any(|&s| s)
-        || game.get_player_select().iter().any(|&s| s)
+    game.enemy_select().iter().any(|&s| s)
+        || game.player_select().iter().any(|&s| s)
 }
 
 /// 選択がなくなったら suit をクリアする
