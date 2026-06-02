@@ -19,16 +19,19 @@ pub fn help_content(app: &mut App, frame: &mut Frame, area: Rect) {
 
     let joker_help = app
         .game
-        .player_hand_copy_joker_source(0)
-        .and_then(|index| {
+        .selected_player_joker_ranks()
+        .into_iter()
+        .filter_map(|joker_rank| {
             app.game
-                .player_hand()
-                .card(index)
-                .map(|card| format!("Joker from card: {}", card.name()))
-        });
+                .player_hand_copy_joker_source(joker_rank)
+                .and_then(|index| app.game.player_hand().card(index))
+                .map(|card| format!("Joker{} from card: {}", joker_rank + 1, card.name()))
+        })
+        .collect::<Vec<_>>()
+        .join(" / ");
 
-    let text = if let Some(ref msg) = joker_help {
-        msg.as_str()
+    let text = if !joker_help.is_empty() {
+        joker_help.as_str()
     } else if app.help_text.is_empty() {
         "Help content: Help text"
     } else {

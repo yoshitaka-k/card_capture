@@ -90,4 +90,17 @@ impl CardSet {
         }
         false
     }
+
+    // 手札のジョーカーのカードを取得
+    pub fn joker_cards(&self) -> Vec<&Card> {
+        let mut joker_cards = Vec::new();
+        for card in self.0.iter() {
+            if let Some(card) = card {
+                if card.is_joker() {
+                    joker_cards.push(card);
+                }
+            }
+        }
+        joker_cards
+    }
 }

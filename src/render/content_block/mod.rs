@@ -92,7 +92,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                     if card.is_joker() {
                         if let Some(copy_label) = app
                             .game
-                            .player_hand_copy_joker_source(0)
+                            .player_hand_copy_joker_source(card.rank())
                             .and_then(|index| {
                                 app.game
                                     .player_hand()
@@ -134,7 +134,7 @@ fn hand_area_layout(app: &mut App, frame: &mut Frame, area: Rect, deck_type: Dec
                     .border_style(Style::default().fg(Color::LightCyan))
                     .padding(Padding::horizontal(1));
 
-                let joker_rank_label = if app.game.is_player_hand_copy_joker(0, hand_index) {
+                let joker_rank_label = if app.game.is_player_hand_copy_joker_any(hand_index) {
                     app.game
                         .player_hand()
                         .card(hand_index)

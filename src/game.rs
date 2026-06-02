@@ -211,6 +211,41 @@ impl Game {
             .position(|&selected| selected)
     }
 
+    /// 任意のジョーカースロットでコピー元として選ばれている手札インデックスかどうか
+    pub fn is_player_hand_copy_joker_any(&self, index: usize) -> bool {
+        self.player_hand_copy_joker
+            .iter()
+            .any(|slots| slots.get(index).copied().unwrap_or(false))
+    }
+
+    /// 選択中ジョーカーのランク一覧を取得
+    pub fn selected_player_joker_ranks(&self) -> Vec<usize> {
+        self.player_select
+            .iter()
+            .enumerate()
+            .filter_map(|(index, selected)| {
+                if !selected {
+                    return None;
+                }
+                self.player_hand
+                    .card(index)
+                    .filter(|card| card.is_joker())
+                    .map(|card| card.rank())
+            })
+            .collect()
+    }
+
+    /// 選択中ジョーカーがすべてコピー元を持っているかどうか
+    pub fn is_selected_player_joker_copy_ready(&self) -> bool {
+        let joker_ranks = self.selected_player_joker_ranks();
+        if joker_ranks.is_empty() {
+            return true;
+        }
+        joker_ranks
+            .iter()
+            .all(|&joker_rank| self.player_hand_copy_joker_source(joker_rank).is_some())
+    }
+
     /// ジョーカーコピー用スロットから未選択のものを除去する
     pub fn compact_player_hand_copy_joker(&mut self, index: usize) {
         self.player_hand_copy_joker[index].retain(|joker| *joker);
@@ -307,8 +342,8 @@ impl Game {
             }
         }
         // コピーしたジョーカーのランクを加算
-        for (index, selected) in self.player_hand_copy_joker[0].iter().enumerate() {
-            if *selected {
+        for joker_index in 0..self.player_hand_copy_joker.len() {
+            if let Some(index) = self.player_hand_copy_joker_source(joker_index) {
                 if let Some(card) = self.player_hand.card(index) {
                     rank += card.calc_rank();
                 }

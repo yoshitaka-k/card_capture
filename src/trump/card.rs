@@ -48,9 +48,6 @@ impl Card {
     }
 
     pub fn rank(&self) -> usize {
-        if self.is_joker() {
-            return 0;
-        }
         self.rank
     }
 

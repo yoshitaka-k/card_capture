@@ -26,4 +26,11 @@ pub(crate) fn clear_select(app: &mut App) {
     app.game.clear_enemy_select();
     app.game.clear_player_select();
     app.game.clear_suit();
+    clear_player_hand_copy_joker(app);
+}
+
+/// ジョーカーコピー用スロットをクリアする
+pub(crate) fn clear_player_hand_copy_joker(app: &mut App) {
+    app.game.clear_player_hand_copy_joker(0);
+    app.game.clear_player_hand_copy_joker(1);
 }
