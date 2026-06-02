@@ -5,6 +5,7 @@ pub mod draw;
 pub mod end;
 pub mod enemy_draw;
 pub mod flags;
+pub mod gameclear_mouse_left;
 pub mod gameover_mouse_left;
 pub mod main_mouse_left;
 pub mod select;

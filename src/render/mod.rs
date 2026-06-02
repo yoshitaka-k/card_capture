@@ -12,3 +12,5 @@ pub mod content_block;
 pub mod popup;
 /// Render the gameover block
 pub mod gameover;
+/// Render the gameclear block
+pub mod gameclear;

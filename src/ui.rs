@@ -8,6 +8,7 @@ use crate::render::{
     header::render_header_block,
     content::render_content_block,
     gameover::render_gameover_block,
+    gameclear::render_gameclear_block,
     footer::render_footer_block,
     popup::exiting::render_exit_popup_block,
 };
@@ -31,7 +32,9 @@ pub fn render(app: &mut App, frame: &mut Frame) {
             // Content Block
             render_content_block(app, frame, chunks[1]);
         }
-        CurrentScreen::GameClear => {}
+        CurrentScreen::GameClear => {
+            render_gameclear_block(app, frame, chunks[1]);
+        }
         CurrentScreen::GameOver => {
             render_gameover_block(app, frame, chunks[1]);
         }

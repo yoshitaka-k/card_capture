@@ -23,6 +23,8 @@ pub struct BlockPosition {
     player_discard: Rect,
     #[getset(get = "pub", set = "pub")]
     gameover: Rect,
+    #[getset(get = "pub", set = "pub")]
+    gameclear: Rect,
 }
 
 impl BlockPosition {
