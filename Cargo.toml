@@ -8,7 +8,6 @@ license = "Apache-2.0"
 
 [profile.release]
 # 速度最優先（配布サイズより実行速度を重視）
-inherits = "release"
 opt-level = 3
 # フルLTOよりリンク時間を抑えつつ速度を狙う
 lto = "thin"
@@ -18,6 +17,7 @@ strip = true
 
 [profile.compact]
 # バイナリサイズ最小化を最優先
+inherits = "release"
 opt-level = "z"
 # ソースファイルを1個に合体
 lto = true
