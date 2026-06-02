@@ -46,9 +46,9 @@ jobs:
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        # 名前を「old_maid-v1.0.0-windows」みたいに綺麗に揃える
-        name: old_maid-${{ github.ref_name }}-${{ matrix.job.artifact-name }}
+        # 名前を「⚪︎⚪︎⚪︎⚪︎-v1.0.0-windows」な感じに揃える
+        name: ${{ github.event.repository.name }}-${{ github.ref_name }}-${{ matrix.job.artifact-name }}
         path: |
           target/${{ matrix.job.target }}/release/*.exe
-          target/${{ matrix.job.target }}/release/old_maid
+          target/${{ matrix.job.target }}/release/${{ github.event.repository.name }}
         if-no-files-found: ignore
