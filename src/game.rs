@@ -5,9 +5,8 @@ use crate::trump::constants::{
     QUEEN_FROM_RANK,
     KING_FROM_RANK,
     ACE_FROM_RANK,
-    SUIT_STR_JOKER,
 };
-use crate::trump::{Card, Deck, DeckType, CardSet};
+use crate::trump::{Card, CardSet, Deck, DeckType, Suit};
 use crate::trump::shuffle::{
     hindu_shuffle,
     riffle_shuffle,
@@ -442,8 +441,9 @@ impl Game {
             return;
         }
         if let Some(card) = self.player_hand.card(index) {
-            if card.suit() != SUIT_STR_JOKER {
-                self.suit.clone_from(card.suit());
+            if card.suit() != Suit::Joker {
+                self.suit.clear();
+                self.suit.push_str(card.suit().as_str());
             }
         }
     }
@@ -453,8 +453,9 @@ impl Game {
             return;
         }
         if let Some(card) = self.enemy_hand.card(index) {
-            if card.suit() != SUIT_STR_JOKER {
-                self.suit.clone_from(card.suit());
+            if card.suit() != Suit::Joker {
+                self.suit.clear();
+                self.suit.push_str(card.suit().as_str());
             }
         }
     }

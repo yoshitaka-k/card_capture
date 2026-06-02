@@ -1,5 +1,5 @@
 use getset::{MutGetters, Setters};
-use crate::trump::{Card};
+use crate::trump::{Card, Suit};
 
 pub enum DeckType {
     Enemy,
@@ -19,16 +19,16 @@ impl Deck {
 
         match deck_type {
             DeckType::Player => {
-                for suit in ["h", "d", "c", "s"] {
+                for suit in [Suit::Hart, Suit::Diamond, Suit::Clover, Suit::Spade] {
                     for rank in [2, 3, 4] {
                         cards.push(Card::new(suit, rank));
                     }
                 }
-                cards.push(Card::new("j", 0));
-                cards.push(Card::new("j", 1));
+                cards.push(Card::new(Suit::Joker, 0));
+                cards.push(Card::new(Suit::Joker, 1));
             }
             DeckType::Enemy => {
-                for suit in ["h", "d", "c", "s"] {
+                for suit in [Suit::Hart, Suit::Diamond, Suit::Clover, Suit::Spade] {
                     for rank in [1, 5, 6, 7, 8, 9, 10, 11, 12, 13] {
                         cards.push(Card::new(suit, rank));
                     }

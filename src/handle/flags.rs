@@ -1,5 +1,10 @@
 use crate::app::App;
 
+#[inline]
+fn selected_count(select: &[bool]) -> usize {
+    select.iter().filter(|&&selected| selected).count()
+}
+
 /// フラグを更新する
 pub(crate) fn update_flags(app: &mut App) {
     if app.is_discard_phase() {
@@ -17,8 +22,9 @@ pub(crate) fn update_flags(app: &mut App) {
 /// プレイヤーの選択したカードの合計ランクが選択した敵のカードの合計ランクより大きければ捕獲成功
 /// それ以外は捕獲失敗
 fn update_player_capture(app: &mut App) -> bool {
-    if app.game.enemy_select().iter().all(|&selected| !selected)
-        || app.game.player_select().iter().all(|&selected| !selected) {
+    let enemy_cnt = selected_count(app.game.enemy_select());
+    let player_cnt = selected_count(app.game.player_select());
+    if enemy_cnt == 0 || player_cnt == 0 {
         app.game.set_player_cupture(false);
         return false;
     }
@@ -46,19 +52,12 @@ fn update_player_capture(app: &mut App) -> bool {
 /// 敵の捕獲フラグを更新する
 /// 敵の手札の右端選択と、プレイヤーの手札の1枚選択があれば敵の捕獲フラグを立てる
 fn update_enemy_capture(app: &mut App) -> bool {
-    if app.game.enemy_select().iter().all(|&selected| !selected)
-        || app.game.player_select().iter().all(|&selected| !selected) {
+    let enemy_cnt = selected_count(app.game.enemy_select());
+    let player_cnt = selected_count(app.game.player_select());
+    if enemy_cnt == 0 || player_cnt == 0 {
         app.game.set_enemy_cupture(false);
         return false;
     }
-
-    let enemy_cnt = app.game.enemy_select()
-        .iter().filter(|&&selected| selected)
-        .count();
-
-    let player_cnt = app.game.player_select()
-        .iter().filter(|&&selected| selected)
-        .count();
 
     // 1枚ずつ選択されてる
     if enemy_cnt == 1 && player_cnt == 1 {
@@ -78,11 +77,12 @@ fn update_enemy_capture(app: &mut App) -> bool {
 
 /// 捨て札フラグを更新する
 fn update_discard(app: &mut App) -> bool {
-    if app.game.enemy_select().iter().all(|&selected| selected) {
+    let enemy_cnt = selected_count(app.game.enemy_select());
+    if enemy_cnt == app.game.enemy_select().len() {
         app.game.set_discard(false);
         return false;
     }
-    if app.game.player_select().iter().all(|&selected| !selected) {
+    if selected_count(app.game.player_select()) == 0 {
         app.game.set_discard(false);
         return false;
     }
@@ -94,14 +94,12 @@ fn update_discard(app: &mut App) -> bool {
 /// 生贄フラグを更新する
 /// 敵の選択したカードが1枚、プレイヤーの選択したカードが2枚あれば生贄フラグを立てる
 fn update_sacrifice(app: &mut App) -> bool {
-    if app.game.enemy_select().iter().all(|&selected| !selected) {
+    if selected_count(app.game.enemy_select()) == 0 {
         app.game.set_sacrifice(false);
         return false;
     }
 
-    let cnt = app.game.player_select()
-        .iter().filter(|&&selected| selected)
-        .count();
+    let cnt = selected_count(app.game.player_select());
 
     app.game.set_sacrifice(cnt == 2);
     cnt == 2

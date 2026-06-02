@@ -10,6 +10,7 @@ pub mod shuffle;
 pub mod constants;
 
 pub use card::Card;
+pub use card::Suit;
 pub use cardset::CardSet;
 pub use deck::Deck;
 pub use deck::DeckType;
