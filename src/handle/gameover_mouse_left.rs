@@ -6,8 +6,8 @@ pub(crate) fn handle_gameover_mouse_left(app: &mut App) {
         GamePhase::End => {
             app.start();
 
-            app.current_phase = GamePhase::Setup;
             app.current_screen = CurrentScreen::Main;
+            app.current_phase = GamePhase::Setup;
         }
         _ => {}
     }

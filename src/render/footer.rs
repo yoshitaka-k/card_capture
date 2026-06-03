@@ -21,6 +21,7 @@ pub fn render_footer_block(app: &App, frame: &mut Frame, area: Rect) {
     // Current Navigation Text
     let current_navigation_text = vec![
         match app.current_screen {
+            CurrentScreen::Title => Span::styled("Title", Style::default().fg(Color::Green).bold()),
             CurrentScreen::Main => Span::styled("Game Playing", Style::default().fg(Color::Green).bold()),
             CurrentScreen::GameClear => Span::styled("Game Clear", Style::default().fg(Color::Green).bold()),
             CurrentScreen::GameOver => Span::styled("Game Over", Style::default().fg(Color::Red).bold()),

@@ -25,6 +25,8 @@ pub struct BlockPosition {
     gameover: Rect,
     #[getset(get = "pub", set = "pub")]
     gameclear: Rect,
+    #[getset(get = "pub", set = "pub")]
+    title: Rect,
 }
 
 impl BlockPosition {

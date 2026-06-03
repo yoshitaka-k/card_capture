@@ -14,3 +14,5 @@ pub mod popup;
 pub mod gameover;
 /// Render the gameclear block
 pub mod gameclear;
+/// Render the title block
+pub mod title;

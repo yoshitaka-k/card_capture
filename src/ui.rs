@@ -7,6 +7,7 @@ use crate::app::{App, CurrentScreen};
 use crate::render::{
     header::render_header_block,
     content::render_content_block,
+    title::render_title_block,
     gameover::render_gameover_block,
     gameclear::render_gameclear_block,
     footer::render_footer_block,
@@ -28,6 +29,9 @@ pub fn render(app: &mut App, frame: &mut Frame) {
 
     // popup window
     match app.current_screen {
+        CurrentScreen::Title => {
+            render_title_block(app, frame, chunks[1]);
+        }
         CurrentScreen::Main => {
             // Content Block
             render_content_block(app, frame, chunks[1]);

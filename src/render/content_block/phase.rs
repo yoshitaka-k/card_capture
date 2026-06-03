@@ -30,6 +30,7 @@ pub fn phase_content(app: &mut App, frame: &mut Frame, area: Rect) {
         .split(inner);
 
     let paragraph = Paragraph::new(match app.current_phase {
+        GamePhase::Title => "Title phase: Title screen",
         GamePhase::Setup => "Setup phase: Enemy draw cards from enemy deck",
         GamePhase::SetupEnd => "Setup end phase: End Setup phase",
         GamePhase::Enemy => "Enemy phase: Enemy draw cards from enemy deck",

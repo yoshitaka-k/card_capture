@@ -3,6 +3,7 @@ use crate::render::block_position::BlockPosition;
 
 /// 現在の画面を管理する列挙体
 pub enum CurrentScreen {
+    Title,
     Main,
     GameClear,
     GameOver,
@@ -12,6 +13,7 @@ pub enum CurrentScreen {
 /// ゲームのフェーズを管理する列挙体
 #[derive(PartialEq)]
 pub enum GamePhase {
+    Title,
     Setup,
     SetupEnd,
     Enemy,
@@ -37,8 +39,8 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         Self {
-            current_screen: CurrentScreen::Main,
-            current_phase: GamePhase::Setup,
+            current_screen: CurrentScreen::Title,
+            current_phase: GamePhase::Title,
             turn: 1,
             game: Game::new(),
             positions: BlockPosition::default(),
@@ -81,6 +83,7 @@ impl App {
     /// フェーズを進める
     pub fn advance_phase(&mut self) {
         self.current_phase = match self.current_phase {
+            GamePhase::Title => GamePhase::Setup,
             GamePhase::Setup => GamePhase::SetupEnd,
             GamePhase::SetupEnd => GamePhase::Enemy,
             GamePhase::Enemy => GamePhase::Discard,
@@ -99,6 +102,8 @@ impl App {
     fn on_phase_enter(&mut self) {
         // フェーズ入り時の初期化（選択クリア、フラグリセットなど）
         match self.current_phase {
+            GamePhase::Title => {
+            }
             GamePhase::Setup => {
                 self.turn = 1;
             }

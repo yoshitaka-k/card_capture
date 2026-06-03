@@ -33,7 +33,7 @@ pub fn render_gameclear_block(app: &mut App, frame: &mut Frame, area: Rect) {
     frame.render_widget(paragraph, content_chunks[1]);
 
     // Game Over Text
-    let text = "You win!\nClick to continue";
+    let text = "--------------------------------\nYou win!\nClick to continue\n--------------------------------";
     let text_paragraph = Paragraph::new(Text::from(text))
         .alignment(Alignment::Center)
         .style(Style::default().fg(Color::Magenta));

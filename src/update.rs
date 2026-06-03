@@ -7,9 +7,12 @@ use ratatui::crossterm::event::{
     MouseButton,
 };
 use crate::app::{App, CurrentScreen};
-use crate::handle::gameclear_mouse_left::handle_gameclear_mouse_left;
-use crate::handle::gameover_mouse_left::handle_gameover_mouse_left;
-use crate::handle::main_mouse_left::handle_main_mouse_left;
+use crate::handle::{
+    main_mouse_left::handle_main_mouse_left,
+    title_mouse_left::handle_title_mouse_left,
+    gameclear_mouse_left::handle_gameclear_mouse_left,
+    gameover_mouse_left::handle_gameover_mouse_left,
+};
 
 /// キーイベントを処理する関数
 pub fn key_update(app: &mut App, key_event: KeyEvent) {
@@ -42,6 +45,14 @@ pub fn key_update(app: &mut App, key_event: KeyEvent) {
 /// マウスイベントを処理する関数
 pub fn mouse_update(app: &mut App, mouse_event: MouseEvent) {
     match app.current_screen {
+        CurrentScreen::Title => {
+            match mouse_event.kind {
+                MouseEventKind::Up(MouseButton::Left) => {
+                    handle_title_mouse_left(app);
+                }
+                _ => {}
+            }
+        }
         CurrentScreen::Main => {
             match mouse_event.kind {
                 MouseEventKind::Up(MouseButton::Left) => {
