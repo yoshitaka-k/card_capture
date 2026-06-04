@@ -1,7 +1,9 @@
+use crate::constants::TITLE_END_PHASE_DELAY_TICKS;
 use crate::game::Game;
 use crate::render::block_position::BlockPosition;
 
 /// 現在の画面を管理する列挙体
+#[derive(PartialEq)]
 pub enum CurrentScreen {
     Title,
     Main,
@@ -14,6 +16,7 @@ pub enum CurrentScreen {
 #[derive(PartialEq)]
 pub enum GamePhase {
     Title,
+    TitleEnd,
     Setup,
     SetupEnd,
     Enemy,
@@ -83,7 +86,8 @@ impl App {
     /// フェーズを進める
     pub fn advance_phase(&mut self) {
         self.current_phase = match self.current_phase {
-            GamePhase::Title => GamePhase::Setup,
+            GamePhase::Title => GamePhase::TitleEnd,
+            GamePhase::TitleEnd => GamePhase::Setup,
             GamePhase::Setup => GamePhase::SetupEnd,
             GamePhase::SetupEnd => GamePhase::Enemy,
             GamePhase::Enemy => GamePhase::Discard,
@@ -102,7 +106,14 @@ impl App {
     fn on_phase_enter(&mut self) {
         // フェーズ入り時の初期化（選択クリア、フラグリセットなど）
         match self.current_phase {
+            GamePhase::TitleEnd => {
+                self.schedule_phase_advance(TITLE_END_PHASE_DELAY_TICKS);
+            }
             GamePhase::Setup => {
+                if self.current_screen == CurrentScreen::Title {
+                    self.start();
+                    self.current_screen = CurrentScreen::Main;
+                }
                 self.turn = 1;
             }
             GamePhase::SetupEnd => {
@@ -133,5 +144,17 @@ impl App {
 
     pub fn is_capture_phase(&self) -> bool {
         self.current_phase == GamePhase::Capture
+    }
+
+    /// TitleEnd 表示中のローディングスピナー用フレーム（0..4）
+    pub fn title_end_spinner_frame(&self) -> usize {
+        if self.current_phase != GamePhase::TitleEnd {
+            return 0;
+        }
+        let elapsed = match self.pending_phase_advance_ticks {
+            Some(remaining) => TITLE_END_PHASE_DELAY_TICKS.saturating_sub(remaining),
+            None => 0,
+        };
+        elapsed as usize % 4
     }
 }

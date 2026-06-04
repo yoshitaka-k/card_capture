@@ -30,7 +30,6 @@ pub fn phase_content(app: &mut App, frame: &mut Frame, area: Rect) {
         .split(inner);
 
     let paragraph = Paragraph::new(match app.current_phase {
-        GamePhase::Title => "Title phase: Title screen",
         GamePhase::Setup => "Setup phase: Enemy draw cards from enemy deck",
         GamePhase::SetupEnd => "Setup end phase: End Setup phase",
         GamePhase::Enemy => "Enemy phase: Enemy draw cards from enemy deck",
@@ -38,6 +37,7 @@ pub fn phase_content(app: &mut App, frame: &mut Frame, area: Rect) {
         GamePhase::Draw => "Player Draw phase: Player draw cards from player deck",
         GamePhase::Capture => "Capture phase: Select cards to capture enemy one and player multiple",
         GamePhase::End => "End phase: Next turn or end game",
+        _ => "",
     });
 
     frame.render_widget(paragraph, inner_chunks[1]);

@@ -7,7 +7,9 @@ use ratatui::{
 };
 use figlet_rs::FIGlet;
 
-use crate::app::App;
+use crate::app::{App, GamePhase};
+
+const TITLE_END_SPINNER: [char; 4] = ['|', '/', '-', '\\'];
 
 pub fn render_title_block(app: &mut App, frame: &mut Frame, area: Rect) {
     app.positions.clear();
@@ -47,7 +49,14 @@ pub fn render_title_block(app: &mut App, frame: &mut Frame, area: Rect) {
     frame.render_widget(paragraph, content_chunks[2]);
 
     // Title Text
-    let text = "--------------------------------\nClick to start\n--------------------------------";
+    let text = if app.current_phase == GamePhase::TitleEnd {
+        let spinner = TITLE_END_SPINNER[app.title_end_spinner_frame()];
+        format!(
+            "--------------------------------\n{spinner} Starting game...🚀\n--------------------------------"
+        )
+    } else {
+        "--------------------------------\nClick to start\n--------------------------------".to_string()
+    };
     let paragraph = Paragraph::new(Text::from(text))
         .alignment(Alignment::Center)
         .style(Style::default().fg(Color::Green));
