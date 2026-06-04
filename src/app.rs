@@ -102,8 +102,6 @@ impl App {
     fn on_phase_enter(&mut self) {
         // フェーズ入り時の初期化（選択クリア、フラグリセットなど）
         match self.current_phase {
-            GamePhase::Title => {
-            }
             GamePhase::Setup => {
                 self.turn = 1;
             }
@@ -113,8 +111,6 @@ impl App {
             }
             GamePhase::Enemy => {
                 self.game.compact_enemy_hand();
-            }
-            GamePhase::Discard => {
             }
             GamePhase::Draw => {
                 self.game.compact_player_hand();
@@ -127,36 +123,15 @@ impl App {
                 self.game.set_discard(false);
                 self.game.set_sacrifice(false);
             }
-            GamePhase::End => {
-            }
+            _ => {}
         }
-    }
-
-    pub fn is_initial_phase(&self) -> bool {
-        self.current_phase == GamePhase::Setup
-    }
-
-    pub fn is_initial_end_phase(&self) -> bool {
-        self.current_phase == GamePhase::SetupEnd
-    }
-
-    pub fn is_enemy_phase(&self) -> bool {
-        self.current_phase == GamePhase::Enemy
     }
 
     pub fn is_discard_phase(&self) -> bool {
         self.current_phase == GamePhase::Discard
     }
 
-    pub fn is_draw_phase(&self) -> bool {
-        self.current_phase == GamePhase::Draw
-    }
-
     pub fn is_capture_phase(&self) -> bool {
         self.current_phase == GamePhase::Capture
-    }
-
-    pub fn is_end_phase(&self) -> bool {
-        self.current_phase == GamePhase::End
     }
 }

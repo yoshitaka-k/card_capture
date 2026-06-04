@@ -1,6 +1,6 @@
 [package]
 name = "card_capture"
-version = "0.21.1"
+version = "0.21.2"
 edition = "2024"
 authors = ["yoshitaka-k"]
 description = "Card Capture"

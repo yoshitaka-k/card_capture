@@ -33,7 +33,6 @@ fn main() -> Result<()> {
             Event::Mouse(mouse_event) => {
                 mouse_update(&mut app, mouse_event);
             }
-            Event::Resize(_, _) => {}
         };
         tui.draw(&mut app)?;
     }

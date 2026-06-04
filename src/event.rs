@@ -9,7 +9,9 @@ use ratatui::crossterm::event::{
     self,
     Event as CrosstermEvent,
     KeyEvent,
-    MouseEvent
+    MouseButton,
+    MouseEvent,
+    MouseEventKind,
 };
 
 #[derive(Clone, Copy, Debug)]
@@ -17,7 +19,6 @@ pub enum Event {
     Tick,
     Key(KeyEvent),
     Mouse(MouseEvent),
-    Resize(u16, u16),
 }
 
 #[derive(Debug)]
@@ -45,24 +46,23 @@ impl EventHandler {
                         .checked_sub(last_tick.elapsed())
                         .unwrap_or(tick_rate);
 
+                    // イベントを取得
                     if event::poll(timeout).expect("unable to poll event") {
-                        match event::read().expect("unable to read event") {
-                            CrosstermEvent::Key(e) => {
-                                if e.kind == event::KeyEventKind::Press {
-                                    sender.send(Event::Key(e))
-                                } else {
-                                    Ok(())
-                                }
-                            }
-                            CrosstermEvent::Mouse(e) => sender.send(Event::Mouse(e)),
-                            CrosstermEvent::Resize(w, h) => sender.send(Event::Resize(w, h)),
-                            _ => Ok(()),
+                        if let Some(ev) = Self::from_crossterm(event::read().expect("unable to read event")) {
+                            Self::dispatch(&sender, ev);
                         }
-                        .expect("failed to send terminal event")
+
+                        // イベントを継続的に処理
+                        while event::poll(Duration::ZERO).expect("unable to poll event") {
+                            if let Some(ev) = Self::from_crossterm(event::read().expect("unable to read event")) {
+                                Self::dispatch(&sender, ev);
+                            }
+                        }
                     }
 
+                    // 1 tick 経過したときの処理
                     if last_tick.elapsed() >= tick_rate {
-                        sender.send(Event::Tick).expect("failed to send tick event");
+                        Self::dispatch(&sender, Event::Tick);
                         last_tick = Instant::now();
                     }
                 }
@@ -73,6 +73,35 @@ impl EventHandler {
             sender,
             receiver,
             handler,
+        }
+    }
+
+    fn from_crossterm(event: CrosstermEvent) -> Option<Event> {
+        match event {
+            CrosstermEvent::Key(e) => Some(Event::Key(e)),
+            CrosstermEvent::Mouse(e) => Some(Event::Mouse(e)),
+            _ => None,
+        }
+    }
+
+    fn dispatch(sender: &mpsc::Sender<Event>, event: Event) {
+        match event {
+            Event::Key(key_event) => {
+                if key_event.kind == event::KeyEventKind::Press {
+                    sender.send(Event::Key(key_event)).expect("failed to send terminal event");
+                }
+            }
+            Event::Mouse(mouse_event) => {
+                if matches!(
+                    mouse_event.kind,
+                    MouseEventKind::Up(MouseButton::Left) | MouseEventKind::Up(MouseButton::Right)
+                ) {
+                    sender.send(Event::Mouse(mouse_event)).expect("failed to send terminal event");
+                }
+            }
+            Event::Tick => {
+                sender.send(Event::Tick).expect("failed to send terminal event");
+            }
         }
     }
 

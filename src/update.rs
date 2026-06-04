@@ -7,11 +7,11 @@ use ratatui::crossterm::event::{
     MouseButton,
 };
 use crate::app::{App, CurrentScreen};
-use crate::handle::{
-    main_mouse_left::handle_main_mouse_left,
-    title_mouse_left::handle_title_mouse_left,
+use crate::handle::mouse_actions::{
     gameclear_mouse_left::handle_gameclear_mouse_left,
     gameover_mouse_left::handle_gameover_mouse_left,
+    main_mouse_left::handle_main_mouse_left,
+    title_mouse_left::handle_title_mouse_left,
 };
 
 /// キーイベントを処理する関数

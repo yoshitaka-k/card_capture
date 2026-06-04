@@ -33,7 +33,6 @@ pub fn render(app: &mut App, frame: &mut Frame) {
             render_title_block(app, frame, chunks[1]);
         }
         CurrentScreen::Main => {
-            // Content Block
             render_content_block(app, frame, chunks[1]);
         }
         CurrentScreen::GameClear => {
