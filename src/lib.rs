@@ -1,5 +1,7 @@
 /// Constants
 pub mod constants;
+/// Hand slot index conversion (visual layout vs storage)
+pub mod hand_index;
 /// Application
 pub mod app;
 /// Event

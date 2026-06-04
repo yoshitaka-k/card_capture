@@ -1,12 +1,7 @@
 use crate::app::App;
-use crate::constants::MAX_HAND_SIZE;
 use crate::game::Game;
 
-/// ビジュアルインデックスを手札インデックスに変換する
-#[inline]
-pub(crate) fn visual_to_hand_index(visual_index: usize) -> usize {
-    MAX_HAND_SIZE - 1 - visual_index
-}
+pub(crate) use crate::hand_index::visual_to_hand_index;
 
 /// 敵またはプレイヤーの手札に選択があるか
 fn has_any_selection(game: &Game) -> bool {

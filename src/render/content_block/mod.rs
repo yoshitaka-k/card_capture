@@ -17,16 +17,11 @@ use ratatui::{
 };
 
 use crate::app::App;
-use crate::trump::deck::DeckType;
 use crate::constants::MAX_HAND_SIZE;
+use crate::hand_index::visual_to_hand_index;
+use crate::trump::deck::DeckType;
 use crate::trump::Card;
 use std::fmt::Write as _;
-
-/// 見た目のインデックスを実データのインデックスに変換する
-#[inline]
-fn visual_to_hand_index(visual_index: usize) -> usize {
-    MAX_HAND_SIZE - 1 - visual_index
-}
 
 /// 手札テキストを構築する
 #[inline]
