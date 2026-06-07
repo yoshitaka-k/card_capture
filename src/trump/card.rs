@@ -163,9 +163,16 @@ impl Card {
     }
 
     pub fn name(&self) -> String {
-        match self.disp_rank() {
-            "" => format!("{}{}", self.disp_suit(), self.rank),
-            rank => format!("{}{}", self.disp_suit(), rank),
+        match self.suit {
+            Suit::Joker => {
+                self.disp_suit().to_string()
+            }
+            _ => {
+                match self.disp_rank() {
+                    "" => format!("{}{}", self.disp_suit(), self.rank),
+                    rank => format!("{}{}", self.disp_suit(), rank),
+                }
+            }
         }
     }
 }
@@ -173,9 +180,16 @@ impl Card {
 impl std::fmt::Display for Card {
     /// スート・ランク表示
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self.disp_rank() {
-            "" => write!(f, "{}{}", self.disp_suit(), self.rank),
-            rank => write!(f, "{}{}", self.disp_suit(), rank),
+        match self.suit {
+            Suit::Joker => {
+                write!(f, "{}", self.disp_suit())
+            }
+            _ => {
+                match self.disp_rank() {
+                    "" => write!(f, "{}{}", self.disp_suit(), self.rank),
+                    rank => write!(f, "{}{}", self.disp_suit(), rank),
+                }
+            }
         }
     }
 }

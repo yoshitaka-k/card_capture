@@ -36,7 +36,7 @@ pub fn render_gameover_block(app: &mut App, frame: &mut Frame, area: Rect) {
     let text = "--------------------------------\nYou lose!\nClick to continue\n--------------------------------";
     let text_paragraph = Paragraph::new(Text::from(text))
         .alignment(Alignment::Center)
-        .style(Style::default().fg(Color::Magenta));
+        .style(Style::default().fg(Color::Red));
 
     frame.render_widget(text_paragraph, content_chunks[2]);
     app.positions.set_gameover(content_chunks[2]);

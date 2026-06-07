@@ -28,7 +28,7 @@ pub fn render_gameclear_block(app: &mut App, frame: &mut Frame, area: Rect) {
 
     let paragraph = Paragraph::new(Text::from(title.clone()))
         .alignment(Alignment::Center)
-        .style(Style::default().fg(Color::Red).bold());
+        .style(Style::default().fg(Color::Green).bold());
 
     frame.render_widget(paragraph, content_chunks[1]);
 
@@ -36,7 +36,7 @@ pub fn render_gameclear_block(app: &mut App, frame: &mut Frame, area: Rect) {
     let text = "--------------------------------\nYou win!\nClick to continue\n--------------------------------";
     let text_paragraph = Paragraph::new(Text::from(text))
         .alignment(Alignment::Center)
-        .style(Style::default().fg(Color::Magenta));
+        .style(Style::default().fg(Color::Green));
 
     frame.render_widget(text_paragraph, content_chunks[2]);
     app.positions.set_gameclear(content_chunks[2]);
